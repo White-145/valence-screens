@@ -1,0 +1,11 @@
+C:\Users\User\IdeaProjects\valence-screens\target\debug\deps\bevy_math-569b06c26ed9198d.rmeta: C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\lib.rs C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\cubic_splines.rs C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\ray.rs C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\rects\mod.rs C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\rects\irect.rs C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\rects\rect.rs C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\rects\urect.rs
+
+C:\Users\User\IdeaProjects\valence-screens\target\debug\deps\bevy_math-569b06c26ed9198d.d: C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\lib.rs C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\cubic_splines.rs C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\ray.rs C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\rects\mod.rs C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\rects\irect.rs C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\rects\rect.rs C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\rects\urect.rs
+
+C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\lib.rs:
+C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\cubic_splines.rs:
+C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\ray.rs:
+C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\rects\mod.rs:
+C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\rects\irect.rs:
+C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\rects\rect.rs:
+C:\Users\User\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_math-0.11.2\src\rects\urect.rs:

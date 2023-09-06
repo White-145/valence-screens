@@ -1,0 +1,2 @@
+cargo:rerun-if-changed=extracted/misc.json
+cargo:rerun-if-changed=extracted/entities.json

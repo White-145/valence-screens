@@ -1,0 +1,1 @@
+{"rustc":16668500072170114593,"features":"","target":0,"profile":0,"path":0,"deps":[[10896629421644792331,"build_script_build",false,9319171457503865259]],"local":[{"RerunIfChanged":{"output":"debug\\build\\valence_entity-349785ee88014599\\output","paths":["extracted/misc.json","extracted/entities.json"]}}],"rustflags":[],"metadata":0,"config":0,"compile_kind":0}

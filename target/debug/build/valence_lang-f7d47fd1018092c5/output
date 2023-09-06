@@ -1,0 +1,1 @@
+cargo:rerun-if-changed=extracted/translation_keys.json

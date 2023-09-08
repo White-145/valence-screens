@@ -4,8 +4,12 @@ use palette::convert::FromColorUnclamped;
 use palette::{Srgb, Lab};
 use valence::prelude::*;
 use valence::text::color::RgbColor;
-use crate::game_manager::{GameManager, PlayerAction};
-use crate::screen::*;
+use game_manager::GameManager;
+use input::PlayerAction;
+use crate::screen::pixel::Style;
+
+use super::*;
+use super::pixel::ScreenPixel;
 
 // Useful struct to manage screen pixels
 #[derive(Component, Clone)]
@@ -74,7 +78,7 @@ impl ScreenBuffer {
         }
     }
 
-    // draws game manager output to buffer
+    // draws buffer from game manager
     pub fn reconstruct(manager: &dyn GameManager, width: u32, height: u32) -> ScreenBuffer {
         let mut buffer = ScreenBuffer::new(width, height);
         for x in 0..width {
@@ -84,12 +88,26 @@ impl ScreenBuffer {
         }
         buffer
     }
+
+    // draws buffer from function
+    pub fn construct<F>(width: u32, height: u32, mut generator: F) -> ScreenBuffer
+    where
+        F: FnMut(u32, u32) -> ScreenPixel,
+    {
+        let mut buffer = ScreenBuffer::new(width, height);
+        for x in 0..width {
+            for y in 0..height {
+                buffer.put(x, y, generator(x, y));
+            }
+        }
+        buffer
+    }
 }
 
 // Buffer could be used as game manager
 impl GameManager for ScreenBuffer {
     // dont really care about init
-    fn init(&mut self, _width: u32, _height: u32) { }
+    fn init(&mut self, _width: u32, _height: u32, _has_fg: bool) { }
 
     fn draw(&self, x: u32, y: u32) -> ScreenPixel {
         self.get(x, y).unwrap_or_default()

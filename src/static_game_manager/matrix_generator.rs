@@ -1,11 +1,11 @@
 use rand::Rng;
 use valence::prelude::*;
 use valence::text::color::RgbColor;
-use crate::buffer::ScreenBuffer;
-use crate::screen::{ScreenPixel, Style};
-use crate::game_manager::default_game_manager::Generator;
+use crate::screen::buffer::ScreenBuffer;
+use crate::static_game_manager::Generator;
+use crate::screen::pixel::{ScreenPixel, Style};
 
-use super::default_game_manager::StaticGameManager;
+use super::StaticGameManager;
 
 const DEFAULT_CHARSET: [char; 12] = ['佘', '佡', '佴', '価', '俪', '倾', '偀', '偧', '偰', '傟', '僀', '價'];
 
@@ -44,7 +44,7 @@ impl Default for MatrixGenerator {
 }
 
 impl Generator for MatrixGenerator {
-    fn init(&mut self, width: u32, height: u32) {
+    fn init(&mut self, width: u32, height: u32, _has_fg: bool) {
         self.width = width;
         self.height = height;
     }

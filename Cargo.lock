@@ -251,7 +251,7 @@ checksum = "bc00ceb34980c03614e35a3a4e218276a0a824e911d07651cd0d858a51e8c0f0"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -277,9 +277,9 @@ dependencies = [
 
 [[package]]
 name = "base64"
-version = "0.21.3"
+version = "0.21.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "414dcefbc63d77c526a76b3afcf6fbb9b5e2791c19c3aa2297733208750c6e53"
+checksum = "9ba43ea6f343b788c8764558649e08df62f86c6ef251fdaeb1ffd010a9ae50a2"
 
 [[package]]
 name = "base64ct"
@@ -324,7 +324,7 @@ dependencies = [
  "proc-macro-crate",
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -346,7 +346,7 @@ dependencies = [
  "proc-macro-crate",
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -500,7 +500,7 @@ checksum = "c5cc78985f4d0ad1fd7b8ead06dcfaa192685775a7b1be158191c788c7d52298"
 dependencies = [
  "bevy_macro_utils 0.11.2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -595,7 +595,7 @@ dependencies = [
  "bevy_macro_utils 0.11.2",
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -770,7 +770,7 @@ checksum = "d1cd460205fe05634d58b32d9bb752b1b4eaf32b2d29cbd4161ba35eb44a2f8c"
 dependencies = [
  "quote",
  "rustc-hash",
- "syn 2.0.31",
+ "syn 2.0.32",
  "toml_edit",
 ]
 
@@ -902,7 +902,7 @@ dependencies = [
  "bit-set",
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
  "uuid",
 ]
 
@@ -1098,7 +1098,7 @@ checksum = "0d104f29e231123c703e8b394e2341d2425c33c5a2e9ab8cc8d0a554bdb62a41"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -1185,7 +1185,7 @@ checksum = "eac32db62a43cf33353ce30b4a208b08193ea2086a1c6c004acb0073c706a29d"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -1263,7 +1263,7 @@ checksum = "965ab7eb5f8f97d2a083c799f3a1b994fc397b2fe2da5d1da1626ce15a39f2b1"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -1274,9 +1274,9 @@ checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
 
 [[package]]
 name = "bytes"
-version = "1.4.0"
+version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "89b2fd2a0dcf38d7971e2194b6b6eebab45ae01067456a7fd93d5547a61b70be"
+checksum = "a2bd12c1caf447e69cd4528f47f94d203fd2582878ecb9e9465484c4148a8223"
 
 [[package]]
 name = "cc"
@@ -1546,7 +1546,7 @@ checksum = "df541e0e2a8069352be228ce4b85a1da6f59bfd325e56f57e4b241babbc3f832"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -1808,7 +1808,7 @@ checksum = "89ca545a94061b6365f2c7355b4b32bd20df3ff95f02da9329b34ccc3bd6ee72"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -2625,7 +2625,7 @@ dependencies = [
  "proc-macro-crate",
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -2723,7 +2723,7 @@ checksum = "b7db010ec5ff3d4385e4f133916faacd9dad0f6a09394c92d825b3aed310fa0a"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -2816,7 +2816,7 @@ dependencies = [
  "phf_shared",
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -2845,7 +2845,7 @@ checksum = "4359fd9c9171ec6e8c62926d6faaf553a8dc3f64e1507e76da7911b4f6a04405"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -3263,9 +3263,9 @@ dependencies = [
 
 [[package]]
 name = "rustls-webpki"
-version = "0.101.4"
+version = "0.101.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d93931baf2d282fff8d3a532bbfd7653f734643161b87e3e01e59a04439bf0d"
+checksum = "45a27e3b59326c16e23d30aeb7a36a24cc0d29e71d68ff611cdfb4a01d013bed"
 dependencies = [
  "ring",
  "untrusted",
@@ -3310,14 +3310,14 @@ checksum = "4eca7ac642d82aa35b60049a6eccb4be6be75e599bd2e9adb5f875a737654af2"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
 name = "serde_json"
-version = "1.0.105"
+version = "1.0.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "693151e1ac27563d6dbcec9dee9fbd5da8539b20fa14ad3752b2e6d363ace360"
+checksum = "2cc66a619ed80bf7a0f6b17dd063a84b88f6dea1813737cf469aef1d081142c2"
 dependencies = [
  "itoa",
  "ryu",
@@ -3458,9 +3458,9 @@ dependencies = [
 
 [[package]]
 name = "socket2"
-version = "0.5.3"
+version = "0.5.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2538b18701741680e0322a2302176d3253a35388e2e62f172f64f4f16605f877"
+checksum = "4031e820eb552adee9295814c0ced9e5cf38ddf1e8b7d566d6de8e2538ea989e"
 dependencies = [
  "libc",
  "windows-sys 0.48.0",
@@ -3526,9 +3526,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.31"
+version = "2.0.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "718fa2415bcb8d8bd775917a1bf12a7931b6dfa890753378538118181e0cb398"
+checksum = "239814284fd6f1a4ffe4ca893952cdd93c224b6a1571c9a9eadd670295c0c9e2"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3595,7 +3595,7 @@ checksum = "49922ecae66cc8a249b77e68d1d0623c1b2c514f0060c27cdc68bd62a1219d35"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -3676,7 +3676,7 @@ dependencies = [
  "parking_lot",
  "pin-project-lite",
  "signal-hook-registry",
- "socket2 0.5.3",
+ "socket2 0.5.4",
  "tokio-macros",
  "windows-sys 0.48.0",
 ]
@@ -3689,7 +3689,7 @@ checksum = "630bdcf245f78637c13ec01ffae6187cca34625e8c63150d424b59e55af2675e"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -3724,9 +3724,9 @@ checksum = "7cda73e2f1397b1262d6dfdcef8aafae14d1de7748d66822d3bfeeb6d03e5e4b"
 
 [[package]]
 name = "toml_edit"
-version = "0.19.14"
+version = "0.19.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f8123f27e969974a3dfba720fdb560be359f57b44302d280ba72e76a74480e8a"
+checksum = "1b5bb770da30e5cbfde35a2d7b9b8a2c4b8ef89548a7a6aeab5c9a576e3e7421"
 dependencies = [
  "indexmap 2.0.0",
  "toml_datetime",
@@ -3759,7 +3759,7 @@ checksum = "5f4f31f56159e98206da9efd823404b79b6ef3143b4a7ab76e67b1751b25a4ab"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
@@ -3888,7 +3888,7 @@ dependencies = [
 [[package]]
 name = "valence"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "anyhow",
  "bevy_app 0.11.2",
@@ -3932,7 +3932,7 @@ dependencies = [
 [[package]]
 name = "valence_advancement"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "bevy_app 0.11.2",
  "bevy_ecs 0.11.2",
@@ -3945,7 +3945,7 @@ dependencies = [
 [[package]]
 name = "valence_anvil"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "bevy_app 0.11.2",
  "bevy_ecs 0.11.2",
@@ -3964,7 +3964,7 @@ dependencies = [
 [[package]]
 name = "valence_boss_bar"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "bevy_app 0.11.2",
  "bevy_ecs 0.11.2",
@@ -3977,17 +3977,17 @@ dependencies = [
 [[package]]
 name = "valence_build_utils"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "anyhow",
  "proc-macro2",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
 name = "valence_entity"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "anyhow",
  "bevy_app 0.11.2",
@@ -4001,7 +4001,7 @@ dependencies = [
  "rustc-hash",
  "serde",
  "serde_json",
- "syn 2.0.31",
+ "syn 2.0.32",
  "tracing",
  "uuid",
  "valence_build_utils",
@@ -4014,7 +4014,7 @@ dependencies = [
 [[package]]
 name = "valence_generated"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "anyhow",
  "heck",
@@ -4030,7 +4030,7 @@ dependencies = [
 [[package]]
 name = "valence_ident"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "serde",
  "thiserror",
@@ -4040,17 +4040,17 @@ dependencies = [
 [[package]]
 name = "valence_ident_macros"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
 name = "valence_inventory"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "bevy_app 0.11.2",
  "bevy_ecs 0.11.2",
@@ -4062,7 +4062,7 @@ dependencies = [
 [[package]]
 name = "valence_lang"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "anyhow",
  "heck",
@@ -4076,7 +4076,7 @@ dependencies = [
 [[package]]
 name = "valence_math"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "glam 0.24.1",
 ]
@@ -4084,7 +4084,7 @@ dependencies = [
 [[package]]
 name = "valence_nbt"
 version = "0.7.0"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "byteorder",
  "cesu8",
@@ -4097,7 +4097,7 @@ dependencies = [
 [[package]]
 name = "valence_network"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4128,7 +4128,7 @@ dependencies = [
 [[package]]
 name = "valence_player_list"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "bevy_app 0.11.2",
  "bevy_ecs 0.11.2",
@@ -4140,7 +4140,7 @@ dependencies = [
 [[package]]
 name = "valence_protocol"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "aes",
  "anyhow",
@@ -4169,18 +4169,18 @@ dependencies = [
 [[package]]
 name = "valence_protocol_macros"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "heck",
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
 ]
 
 [[package]]
 name = "valence_registry"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "anyhow",
  "bevy_app 0.11.2",
@@ -4198,7 +4198,7 @@ dependencies = [
 [[package]]
 name = "valence_scoreboard"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "bevy_app 0.11.2",
  "bevy_ecs 0.11.2",
@@ -4210,7 +4210,7 @@ dependencies = [
 [[package]]
 name = "valence_server"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "anyhow",
  "arrayvec",
@@ -4239,7 +4239,7 @@ dependencies = [
 [[package]]
 name = "valence_server_common"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "bevy_app 0.11.2",
  "bevy_ecs 0.11.2",
@@ -4252,7 +4252,7 @@ dependencies = [
 [[package]]
 name = "valence_text"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "serde",
  "serde_json",
@@ -4265,7 +4265,7 @@ dependencies = [
 [[package]]
 name = "valence_weather"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "bevy_app 0.11.2",
  "bevy_ecs 0.11.2",
@@ -4276,7 +4276,7 @@ dependencies = [
 [[package]]
 name = "valence_world_border"
 version = "0.2.0-alpha.1+mc.1.20.1"
-source = "git+https://github.com/valence-rs/valence#1ddde71963ca3b15e8d97d1e4383b61431a30bbc"
+source = "git+https://github.com/valence-rs/valence#c3d112df657218c07bf922ee2227db3f3f24748c"
 dependencies = [
  "bevy_app 0.11.2",
  "bevy_ecs 0.11.2",
@@ -4344,7 +4344,7 @@ dependencies = [
  "once_cell",
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
  "wasm-bindgen-shared",
 ]
 
@@ -4378,7 +4378,7 @@ checksum = "54681b18a46765f095758388f2d0cf16eb8d4169b639ab575a8f5693af210c7b"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.31",
+ "syn 2.0.32",
  "wasm-bindgen-backend",
  "wasm-bindgen-shared",
 ]
@@ -4781,9 +4781,9 @@ dependencies = [
 
 [[package]]
 name = "xml-rs"
-version = "0.8.17"
+version = "0.8.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1eee6bf5926be7cf998d7381a9a23d833fd493f6a8034658a9505a4dc4b20444"
+checksum = "bab77e97b50aee93da431f2cee7cd0f43b4d1da3c408042f2d7d164187774f0a"
 
 [[package]]
 name = "zeroize"

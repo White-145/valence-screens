@@ -2,6 +2,7 @@ use rand::Rng;
 use valence::prelude::*;
 use valence::text::color::RgbColor;
 use crate::screen::buffer::ScreenBuffer;
+use crate::screen::input::{Uid, PlayerAction};
 use crate::static_game_manager::Generator;
 use crate::screen::pixel::{ScreenPixel, Style};
 
@@ -90,4 +91,6 @@ impl Generator for MatrixGenerator {
         }
         buffer
     }
+
+    fn action(&mut self, _player: Uid, _action: PlayerAction) { }
 }

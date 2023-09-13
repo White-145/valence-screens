@@ -1,20 +1,23 @@
 pub mod matrix_generator;
 pub mod rainbow_generator;
+pub mod snake_generator;
 
 use valence::prelude::*;
 
 use crate::screen::buffer::ScreenBuffer;
 use crate::screen::game_manager::GameManager;
 use crate::screen::pixel::ScreenPixel;
-use crate::screen::input::{Uid, PlayerAction, MoveDir};
+use crate::screen::input::{Uid, PlayerAction};
 
-// Older version of screen manager that doesnt respond to inputs and draws entire buffer instead of individual pixels
+// Screen manager that draws entire buffer instead of individual pixels
 pub trait Generator: Sync + Send + 'static {
     fn init(&mut self, width: u32, height: u32, has_fg: bool);
 
     fn tick(&mut self, time: f64);
 
     fn draw(&self) -> ScreenBuffer;
+
+    fn action(&mut self, player: Uid, action: PlayerAction);
 }
 
 // Game manager that uses generator
@@ -50,44 +53,7 @@ impl<T: Generator> GameManager for StaticGameManager<T> {
         self.buffer = self.generator.draw();
     }
 
-    fn action(&mut self, player: Uid, action: PlayerAction, is_sneaking: bool) {
-        // debug
-        let action_str = match action {
-            PlayerAction::Primary(position) => {
-                match position {
-                    None => "Primary".to_owned(),
-                    Some(position) => format!("Primary at {} {}", position.0, position.1)
-                }
-            },
-            PlayerAction::Secondary(position) => {
-                match position {
-                    None => "Secondary".to_owned(),
-                    Some(position) => format!("Secondary at {} {}", position.0, position.1)
-                }
-            },
-            PlayerAction::Swap => "Swap".to_owned(),
-            PlayerAction::Drop => "Drop".to_owned(),
-            PlayerAction::Move(direction) => format!("Move to {}", match direction {
-                MoveDir::Left => "Left".to_owned(),
-                MoveDir::Up => "Up".to_owned(),
-                MoveDir::Down => "Down".to_owned(),
-                MoveDir::Right => "Right".to_owned(),
-            }),
-            PlayerAction::SpecialMove(direction) => format!("Special Move to {}", match direction {
-                MoveDir::Left => "Left".to_owned(),
-                MoveDir::Up => "Up".to_owned(),
-                MoveDir::Down => "Down".to_owned(),
-                MoveDir::Right => "Right".to_owned(),
-            }),
-            PlayerAction::Input(input) => format!("Input \"{}\"", input),
-            PlayerAction::Hover(position) => {
-                match position {
-                    None => "Hover".to_owned(),
-                    Some(position) => format!("Hover at {} {}", position.0, position.1)
-                }
-            },
-            PlayerAction::Free => "Freed".to_owned(),
-        };
-        println!("action {action_str} with player {player} and sneaking {is_sneaking}");
+    fn action(&mut self, player: Uid, action: PlayerAction) {
+        self.generator.action(player, action);
     }
 }

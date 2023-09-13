@@ -3,6 +3,7 @@ use noise::{NoiseFn, Simplex, Perlin};
 use valence::text::color::RgbColor;
 use valence::prelude::*;
 use crate::screen::buffer::ScreenBuffer;
+use crate::screen::input::{Uid, PlayerAction};
 use crate::screen::pixel::{ScreenPixel, Style};
 
 use super::{StaticGameManager, Generator};
@@ -84,4 +85,6 @@ impl Generator for RainbowGenerator {
             pixel
         })
     }
+
+    fn action(&mut self, _player: Uid, _action: PlayerAction) { }
 }

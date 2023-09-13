@@ -11,6 +11,7 @@ use super::game_manager::GameManager;
 
 pub type Uid = u8;
 
+#[derive(PartialEq)]
 pub enum MoveDir {
     Up,
     Left,
@@ -18,30 +19,62 @@ pub enum MoveDir {
     Right,
 }
 
+impl MoveDir {
+    pub fn opposite(&self) -> MoveDir {
+        match self {
+            MoveDir::Up => MoveDir::Down,
+            MoveDir::Left => MoveDir::Right,
+            MoveDir::Down => MoveDir::Up,
+            MoveDir::Right => MoveDir::Left,
+        }
+    }
+}
+
 pub enum PlayerAction {
     // Right click
     // TODO: include position on screen
-    Primary(Option<(u32, u32)>),
+    Primary {
+        position : Option<(u32, u32)>,
+        is_sneaking : bool,
+    },
     // Left click
     // TODO: include position on screen
-    Secondary(Option<(u32, u32)>),
+    Secondary {
+        position : Option<(u32, u32)>,
+        is_sneaking : bool,
+    },
     // Swap Hands
-    Swap,
+    Swap {
+        is_sneaking : bool,
+    },
     // Drop
-    Drop,
+    Drop {
+        is_sneaking : bool,
+    },
     // Player movement with WASD (requires sitting on something)
     // TODO: implement
-    Move(MoveDir),
+    Move {
+        direction : MoveDir,
+        is_sneaking : bool,
+    },
     // Slot movement (last 4 slots of the hotbar)
-    SpecialMove(MoveDir),
+    SpecialMove {
+        direction : MoveDir,
+        is_sneaking : bool,
+    },
     // Text input via chat/command
     // TODO: implement
-    Input(String),
+    Input {
+        input : String,
+    },
     // Change of cursor position on screen
     // TODO: implement
-    Hover(Option<(u32, u32)>),
-    // Uid is freed TODO: implement
-    Free,
+    Hover {
+        position : Option<(u32, u32)>,
+        is_sneaking : bool,
+    },
+    // Player disconnected and uid is freed
+    Disconnect,
 }
 
 // Player data to manage inputs
@@ -104,29 +137,31 @@ pub fn get_controller_item() -> ItemStack {
 pub fn build(app: &mut App) {
     app
         .add_systems(Update, (update_primary_prevention, remove_clients))
-        .add_systems(EventLoopPreUpdate, process_actions)
+        .add_systems(EventLoopUpdate, process_actions)
         .insert_resource(GameData {
             occupied_uids : [false; Uid::MAX as usize],
             next_free_uid : 0,
         });
 }
 
-fn update_primary_prevention(
-    mut datas: Query<&mut PlayerData>
-) {
-    for mut data in datas.iter_mut() {
-        data.prevent_primary = false;
+fn update_primary_prevention(mut player_datas: Query<&mut PlayerData>) {
+    for mut player_data in player_datas.iter_mut() {
+        player_data.prevent_primary = false;
     }
 }
 
 pub fn remove_clients(
     mut data: ResMut<GameData>,
+    mut managers: Query<One<&mut dyn GameManager>>,
     player_datas: Query<&PlayerData>,
     mut clients: RemovedComponents<Client>,
 ) {
     for client in clients.iter() {
         if let Ok(player_data) = player_datas.get(client) {
             free_uid(data.as_mut(), player_data.uid);
+            if let Ok(mut manager) = managers.get_mut(player_data.manager_id) {
+                manager.action(player_data.uid, PlayerAction::Disconnect);
+            }
         }
     }
 }
@@ -160,7 +195,7 @@ fn process_actions(
             continue;
         };
         data.prevent_primary = true;
-        manager.action(data.uid, PlayerAction::Secondary(None), data.is_sneaking);
+        manager.action(data.uid, PlayerAction::Secondary { position : None, is_sneaking : data.is_sneaking });
     }
 
     for event in hand_swing_event.iter() {
@@ -174,7 +209,7 @@ fn process_actions(
         let Ok(mut manager) = managers.get_mut(data.manager_id) else {
             continue;
         };
-        manager.action(data.uid, PlayerAction::Primary(None), data.is_sneaking);
+        manager.action(data.uid, PlayerAction::Primary { position : None, is_sneaking : data.is_sneaking });
     }
 
     for event in packet_event.iter() {
@@ -189,20 +224,20 @@ fn process_actions(
         let Ok(mut manager) = managers.get_mut(data.manager_id) else {
             continue;
         };
-        manager.action(data.uid, PlayerAction::Swap, data.is_sneaking);
+        manager.action(data.uid, PlayerAction::Swap { is_sneaking : data.is_sneaking });
     }
     
     for event in drop_event.iter() {
-        let (mut data, mut inventory, _held_item) = clients.get_mut(event.client).unwrap();
         if !is_controller(&event.stack) {
             continue;
         }
+        let (mut data, mut inventory, _held_item) = clients.get_mut(event.client).unwrap();
         let Ok(mut manager) = managers.get_mut(data.manager_id) else {
             continue;
         };
         data.prevent_primary = true;
 
-        manager.action(data.uid, PlayerAction::Drop, data.is_sneaking);
+        manager.action(data.uid, PlayerAction::Drop { is_sneaking : data.is_sneaking });
 
         // Return item back
         let mut slot = 36;
@@ -217,7 +252,7 @@ fn process_actions(
 
     for event in change_slot_event.iter() {
         // Cool (imo) movement input based on hotbar slots (last 4 of them)
-        let (mut data, inventory, _held_item) = clients.get_mut(event.client).unwrap();
+        let (mut data, inventory, mut held_item) = clients.get_mut(event.client).unwrap();
         let old_slot = data.old_slot;
         data.old_slot = event.slot as u16;
         if event.slot < 5 {
@@ -236,7 +271,9 @@ fn process_actions(
             8 => MoveDir::Right,
             _ => unreachable!()
         };
-        manager.action(data.uid, PlayerAction::SpecialMove(dir), data.is_sneaking);
+        data.old_slot = old_slot;
+        held_item.set_slot(36 + old_slot);
+        manager.action(data.uid, PlayerAction::SpecialMove { direction : dir, is_sneaking : data.is_sneaking });
     }
 }
 

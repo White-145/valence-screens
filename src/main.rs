@@ -5,6 +5,7 @@ mod static_game_manager;
 
 use static_game_manager::StaticGameManager;
 use static_game_manager::rainbow_generator::RainbowGenerator;
+use valence::message::ChatMessageEvent;
 use valence::prelude::*;
 use std::ops::Add;
 use bevy_trait_query::{One, RegisterExt};
@@ -14,6 +15,7 @@ use screen::game_manager::GameManager;
 
 use crate::screen::buffer::ScreenBuffer;
 use crate::static_game_manager::matrix_generator::MatrixGenerator;
+use crate::static_game_manager::snake_generator::SnakeGenerator;
 
 const SPAWN_Y: i32 = 64;
 
@@ -21,11 +23,12 @@ pub fn main() {
     App::new()
         .add_plugins((DefaultPlugins, screen::ScreenPlugin))
         .add_systems(Startup, build)
-        .add_systems(Update, init_clients)
+        .add_systems(Update, (init_clients, chat))
         // You need to register all your game managers like this:
         .register_component_as::<dyn GameManager, ScreenBuffer>()
         .register_component_as::<dyn GameManager, StaticGameManager<MatrixGenerator>>()
         .register_component_as::<dyn GameManager, StaticGameManager<RainbowGenerator>>()
+        .register_component_as::<dyn GameManager, StaticGameManager<SnakeGenerator>>()
         .run();
 }
 
@@ -93,7 +96,8 @@ fn build(
         pixel_size,
         true,
         // Game manager
-        ScreenBuffer::load_image("valence.png", width, height, true)
+        // ScreenBuffer::load_image("valence.png", width, height, true)
+        SnakeGenerator::default_manager()
     );
 }
 
@@ -140,5 +144,24 @@ fn init_clients(
         // required for inputs
         screen::input::init_client(&mut commands, &mut data, entity, manager_id);
         inventory.as_mut().set_slot(36, screen::input::get_controller_item());
+    }
+}
+
+fn chat(
+    mut chat_message_event: EventReader<ChatMessageEvent>,
+    usernames: Query<&Username>,
+    mut clients: Query<&mut Client>,
+) {
+    for event in chat_message_event.iter() {
+        let username = &usernames.get(event.client).unwrap().0;
+        let message = &*event.message;
+        let message_text = Text::text(" ")
+            .add_child(username)
+            .add_child(Text::text(": ").color(Color::GRAY))
+            .add_child(message.to_string());
+
+        for mut client in clients.iter_mut() {
+            client.as_mut().send_chat_message(message_text.clone());
+        }
     }
 }

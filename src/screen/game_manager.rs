@@ -13,5 +13,5 @@ pub trait GameManager: Send + Sync + 'static {
     fn tick(&mut self, time: f64);
 
     // player action with player uid, action and whether player is sneaking (for extra functionality)
-    fn action(&mut self, player: u8, action: PlayerAction, is_sneaking: bool);
+    fn action(&mut self, player: u8, action: PlayerAction);
 }

@@ -115,7 +115,7 @@ impl GameManager for ScreenBuffer {
 
     fn tick(&mut self, _time: f64) { }
 
-    fn action(&mut self, _player: u8, _action: PlayerAction, _is_sneaking: bool) { }
+    fn action(&mut self, _player: u8, _action: PlayerAction) { }
 }
 
 impl ScreenBuffer {

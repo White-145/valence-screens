@@ -109,11 +109,11 @@ impl Generator for SnakeGenerator {
     }
 
     fn action(&mut self, player: Uid, action: PlayerAction) {
-        if let None = self.player {
-            self.player = Some(player);
-        }
         if let PlayerAction::SpecialMove { direction, is_sneaking : _is_sneaking } = action {
-            if player == self.player.unwrap() && direction.opposite() != self.direction {
+            if let None = self.player {
+                self.player = Some(player);
+                self.direction = direction;
+            } else if player == self.player.unwrap() && direction != self.direction.opposite() {
                 self.direction = direction;
             }
         }

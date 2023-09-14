@@ -97,8 +97,9 @@ impl Generator for SnakeGenerator {
 
     fn draw(&self) -> ScreenBuffer {
         let mut buffer = ScreenBuffer::new(self.width, self.height);
-        for snake in self.snake.iter() {
-            buffer.put_bg(snake.0 as u32, snake.1 as u32, RgbColor::new(0, 255, 0));
+        for (i, snake) in self.snake.iter().enumerate() {
+            let color = 127 + (128.0 / self.snake.len() as f64 * (i + 1) as f64) as u8;
+            buffer.put_bg(snake.0 as u32, snake.1 as u32, RgbColor::new(0, color, 0));
         }
         buffer.put_bg(self.apple.0 as u32, self.apple.1 as u32, RgbColor::new(255, 0, 0));
         let pointer_pos = self.direction.apply(self.snake.get(self.snake.len() - 1).unwrap(), 2);

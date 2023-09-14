@@ -23,7 +23,7 @@ pub fn main() {
     App::new()
         .add_plugins((DefaultPlugins, screen::ScreenPlugin))
         .add_systems(Startup, build)
-        .add_systems(Update, (init_clients, chat))
+        .add_systems(Update, (despawn_disconnected_clients, init_clients, chat))
         // You need to register all your game managers like this:
         .register_component_as::<dyn GameManager, ScreenBuffer>()
         .register_component_as::<dyn GameManager, StaticGameManager<MatrixGenerator>>()
@@ -80,7 +80,7 @@ fn build(
     let layer_id = commands.spawn(layer).id();
 
     // pixels per block half, works fine only with powers of 2 for some reason
-    let pixel_size = 4;
+    let pixel_size = 8;
     let width = HORIZONTAL_SIZE * 2 * pixel_size;
     let height = VERTICAL_SIZE * 2 * pixel_size;
     let _ = screen::build_screen(

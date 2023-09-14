@@ -28,6 +28,15 @@ impl MoveDir {
             MoveDir::Right => MoveDir::Left,
         }
     }
+
+    pub fn apply(&self, position: &(i32, i32), times: u32) -> (i32, i32) {
+        match self {
+            MoveDir::Up => (position.0, position.1 - times as i32),
+            MoveDir::Left => (position.0 - times as i32, position.1),
+            MoveDir::Down => (position.0, position.1 + times as i32),
+            MoveDir::Right => (position.0 + times as i32, position.1),
+        }
+    }
 }
 
 pub enum PlayerAction {

@@ -16,8 +16,9 @@ pub struct SnakeGenerator {
     snake : Vec<(i32, i32)>,
     apple: (i32, i32),
     direction : MoveDir,
-    player : Option<Uid>,
-    length : u32,
+    current_player : Option<Uid>,
+    score : u32,
+    high_score : u32,
     delay : u32,
 }
 
@@ -29,8 +30,9 @@ impl Default for SnakeGenerator {
             snake : vec![],
             apple : (0, 0),
             direction : MoveDir::Up,
-            player : None,
-            length : 0,
+            current_player : None,
+            score : 0,
+            high_score : 1,
             delay : 0,
         }
     }
@@ -39,11 +41,11 @@ impl Default for SnakeGenerator {
 impl SnakeGenerator {
     fn gen_apple(&mut self) {
         let mut rng = rand::thread_rng();
-        let mut x = rng.gen_range(0..self.width) as i32;
-        let mut y = rng.gen_range(0..self.height) as i32;
+        let mut x = rng.gen_range(3..(self.width - 3)) as i32;
+        let mut y = rng.gen_range(3..(self.height - 3)) as i32;
         while self.snake.contains(&(x, y)) {
-            x = rng.gen_range(0..self.width) as i32;
-            y = rng.gen_range(0..self.height) as i32;
+            x = rng.gen_range(3..(self.width - 3)) as i32;
+            y = rng.gen_range(3..(self.height - 3)) as i32;
         }
         self.apple = (x, y);
     }
@@ -57,16 +59,16 @@ impl Generator for SnakeGenerator {
     fn init(&mut self, width: u32, height: u32, _has_fg: bool) {
         self.width = width;
         self.height = height;
-        self.snake = vec![(1, 1)];
+        self.snake = vec![(4, 4)];
         self.direction = MoveDir::Up;
-        self.player = None;
-        self.length = 1;
+        self.current_player = None;
+        self.score = 1;
         self.delay = 0;
         self.gen_apple();
     }
 
     fn tick(&mut self, _time: f64) {
-        if let None = self.player {
+        if let None = self.current_player {
             return;
         }
         if self.delay >= 1 {
@@ -76,24 +78,21 @@ impl Generator for SnakeGenerator {
             self.delay += 1;
         }
         let pos = self.snake.get(self.snake.len() - 1).unwrap();
-        let mut next_pos = pos.clone();
-        match self.direction {
-            MoveDir::Up => next_pos.1 -= 1,
-            MoveDir::Left => next_pos.0 -= 1,
-            MoveDir::Down => next_pos.1 += 1,
-            MoveDir::Right => next_pos.0 += 1,
-        }
+        let next_pos = self.direction.apply(pos, 1);
         if self.apple == next_pos {
             self.gen_apple();
-            self.length += 1;
+            self.score += 1;
         } else {
             self.snake.remove(0);
         }
         if next_pos.0 < 0 || next_pos.1 < 0 || next_pos.0 >= self.width as i32 || next_pos.1 >= self.height as i32 || self.snake.contains(&next_pos) {
+            if self.high_score < self.score {
+                self.high_score = self.score;
+            }
             self.init(self.width, self.height, false);
-            return;
+        } else {
+            self.snake.push(next_pos);
         }
-        self.snake.push(next_pos);
     }
 
     fn draw(&self) -> ScreenBuffer {
@@ -102,19 +101,42 @@ impl Generator for SnakeGenerator {
             buffer.put_bg(snake.0 as u32, snake.1 as u32, RgbColor::new(0, 255, 0));
         }
         buffer.put_bg(self.apple.0 as u32, self.apple.1 as u32, RgbColor::new(255, 0, 0));
-        for (i, char) in self.length.to_string().chars().enumerate() {
-            buffer.put_fg(i as u32, 0, char, RgbColor::new(255, 255, 255), Style::default());
+        let pointer_pos = self.direction.apply(self.snake.get(self.snake.len() - 1).unwrap(), 2);
+        if pointer_pos.0 >= 0 && pointer_pos.1 >= 0 && self.current_player.is_some() {
+            let pointer = match self.direction {
+                MoveDir::Up => '⏶',
+                MoveDir::Left => '⏴',
+                MoveDir::Down => '⏷',
+                MoveDir::Right => '⏵',
+            };
+            buffer.put_fg(pointer_pos.0 as u32, pointer_pos.1 as u32, pointer, RgbColor::new(128, 128, 128), Style::default());
+        }
+        let score_str = format!("SCORE:{}", self.score);
+        for (i, char) in score_str.chars().enumerate() {
+            buffer.put_fg(i as u32 + 1, 1, char, RgbColor::new(255, 255, 255), Style::default());
+        }
+        let high_score_str = format!("HIGH:{}", self.high_score);
+        for (i, char) in high_score_str.chars().enumerate() {
+            buffer.put_fg(self.width - high_score_str.len() as u32 - 1 + i as u32, 1, char, RgbColor::new(255, 255, 255), Style::default());
         }
         buffer
     }
 
     fn action(&mut self, player: Uid, action: PlayerAction) {
         if let PlayerAction::SpecialMove { direction, is_sneaking : _is_sneaking } = action {
-            if let None = self.player {
-                self.player = Some(player);
+            if let Some(current_player) = self.current_player {
+                if player == current_player && direction != self.direction.opposite() {
+                    self.direction = direction;
+                }
+            } else {
+                self.current_player = Some(player);
                 self.direction = direction;
-            } else if player == self.player.unwrap() && direction != self.direction.opposite() {
-                self.direction = direction;
+            }
+        } else if let PlayerAction::Disconnect = action {
+            if let Some(current_player) = self.current_player {
+                if current_player == player {
+                    self.init(self.width, self.height, false);
+                }
             }
         }
     }

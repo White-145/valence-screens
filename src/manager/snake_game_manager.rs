@@ -3,14 +3,12 @@ use valence::prelude::*;
 use valence::text::color::RgbColor;
 
 use crate::screen::pixel::Style;
-use crate::static_game_manager::Generator;
 use crate::screen::input::{PlayerAction, Uid, MoveDir};
 use crate::screen::buffer::ScreenBuffer;
-
-use super::StaticGameManager;
+use crate::screen::game_manager::GameManager;
 
 #[derive(Component)]
-pub struct SnakeGenerator {
+pub struct SnakeGameManager {
     width : u32,
     height : u32,
     snake : Vec<(i32, i32)>,
@@ -22,23 +20,23 @@ pub struct SnakeGenerator {
     delay : u32,
 }
 
-impl Default for SnakeGenerator {
+impl Default for SnakeGameManager {
     fn default() -> Self {
-        SnakeGenerator {
-            width : 0,
-            height : 0,
-            snake : vec![],
-            apple : (0, 0),
+        SnakeGameManager {
+            width: 0,
+            height: 0,
+            snake: vec![],
+            apple: (0, 0),
             direction : MoveDir::Up,
-            current_player : None,
-            score : 0,
-            high_score : 1,
-            delay : 0,
+            current_player: None,
+            score: 0,
+            high_score: 0,
+            delay: 0,
         }
     }
 }
 
-impl SnakeGenerator {
+impl SnakeGameManager {
     fn gen_apple(&mut self) {
         let mut rng = rand::thread_rng();
         let mut x = rng.gen_range(3..(self.width - 3)) as i32;
@@ -49,13 +47,9 @@ impl SnakeGenerator {
         }
         self.apple = (x, y);
     }
-
-    pub fn default_manager() -> StaticGameManager<SnakeGenerator> {
-        StaticGameManager::new(SnakeGenerator::default())
-    }
 }
 
-impl Generator for SnakeGenerator {
+impl GameManager for SnakeGameManager {
     fn init(&mut self, width: u32, height: u32, _has_fg: bool) {
         self.width = width;
         self.height = height;
@@ -65,34 +59,6 @@ impl Generator for SnakeGenerator {
         self.score = 1;
         self.delay = 0;
         self.gen_apple();
-    }
-
-    fn tick(&mut self, _time: f64) {
-        if let None = self.current_player {
-            return;
-        }
-        if self.delay >= 1 {
-            self.delay = 0;
-            return;
-        } else {
-            self.delay += 1;
-        }
-        let pos = self.snake.get(self.snake.len() - 1).unwrap();
-        let next_pos = self.direction.apply(pos, 1);
-        if self.apple == next_pos {
-            self.gen_apple();
-            self.score += 1;
-        } else {
-            self.snake.remove(0);
-        }
-        if next_pos.0 < 0 || next_pos.1 < 0 || next_pos.0 >= self.width as i32 || next_pos.1 >= self.height as i32 || self.snake.contains(&next_pos) {
-            if self.high_score < self.score {
-                self.high_score = self.score;
-            }
-            self.init(self.width, self.height, false);
-        } else {
-            self.snake.push(next_pos);
-        }
     }
 
     fn draw(&self) -> ScreenBuffer {
@@ -121,6 +87,34 @@ impl Generator for SnakeGenerator {
             buffer.put_fg(self.width - high_score_str.len() as u32 - 1 + i as u32, 1, char, RgbColor::new(255, 255, 255), Style::default());
         }
         buffer
+    }
+
+    fn tick(&mut self, _time: f64) {
+        if let None = self.current_player {
+            return;
+        }
+        if self.delay >= 1 {
+            self.delay = 0;
+            return;
+        } else {
+            self.delay += 1;
+        }
+        let pos = self.snake.get(self.snake.len() - 1).unwrap();
+        let next_pos = self.direction.apply(pos, 1);
+        if self.apple == next_pos {
+            self.gen_apple();
+            self.score += 1;
+        } else {
+            self.snake.remove(0);
+        }
+        if next_pos.0 < 0 || next_pos.1 < 0 || next_pos.0 >= self.width as i32 || next_pos.1 >= self.height as i32 || self.snake.contains(&next_pos) {
+            if self.high_score < self.score {
+                self.high_score = self.score;
+            }
+            self.init(self.width, self.height, false);
+        } else {
+            self.snake.push(next_pos);
+        }
     }
 
     fn action(&mut self, player: Uid, action: PlayerAction) {

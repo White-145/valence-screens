@@ -1,21 +1,19 @@
 #![allow(dead_code)]
 
 mod screen;
-mod static_game_manager;
+mod manager;
 
-use static_game_manager::StaticGameManager;
-use static_game_manager::rainbow_generator::RainbowGenerator;
 use valence::message::ChatMessageEvent;
 use valence::prelude::*;
 use std::ops::Add;
 use bevy_trait_query::{One, RegisterExt};
 
-use screen::input::GameData;
-use screen::game_manager::GameManager;
-
 use crate::screen::buffer::ScreenBuffer;
-use crate::static_game_manager::matrix_generator::MatrixGenerator;
-use crate::static_game_manager::snake_generator::SnakeGenerator;
+use crate::screen::game_manager::GameManager;
+use crate::screen::input::GameData;
+use crate::manager::rainbow_game_manager::RainbowGameManager;
+use crate::manager::matrix_game_manager::MatrixGameManager;
+use crate::manager::snake_game_manager::SnakeGameManager;
 
 const SPAWN_Y: i32 = 64;
 
@@ -26,9 +24,9 @@ pub fn main() {
         .add_systems(Update, (despawn_disconnected_clients, init_clients, chat))
         // You need to register all your game managers like this:
         .register_component_as::<dyn GameManager, ScreenBuffer>()
-        .register_component_as::<dyn GameManager, StaticGameManager<MatrixGenerator>>()
-        .register_component_as::<dyn GameManager, StaticGameManager<RainbowGenerator>>()
-        .register_component_as::<dyn GameManager, StaticGameManager<SnakeGenerator>>()
+        .register_component_as::<dyn GameManager, MatrixGameManager>()
+        .register_component_as::<dyn GameManager, RainbowGameManager>()
+        .register_component_as::<dyn GameManager, SnakeGameManager>()
         .run();
 }
 
@@ -80,7 +78,7 @@ fn build(
     let layer_id = commands.spawn(layer).id();
 
     // pixels per block half, works fine only with powers of 2 for some reason
-    let pixel_size = 8;
+    let pixel_size = 4;
     let width = HORIZONTAL_SIZE * 2 * pixel_size;
     let height = VERTICAL_SIZE * 2 * pixel_size;
     let _ = screen::build_screen(
@@ -97,7 +95,7 @@ fn build(
         true,
         // Game manager
         // ScreenBuffer::load_image("valence.png", width, height, true)
-        SnakeGenerator::default_manager()
+        MatrixGameManager::default()
     );
 }
 

@@ -29,7 +29,7 @@ impl Default for ScreenBuffer {
 impl ScreenBuffer {
     // create a new buffer of default screen pixels with given size
     pub fn new(width: u32, height: u32) -> Self {
-        ScreenBuffer { width: width, height: height, buffer: vec![ScreenPixel::default(); (width * height) as usize] }
+        ScreenBuffer { width, height, buffer: vec![ScreenPixel::default(); (width * height) as usize] }
     }
 
     // inner function to get single number index from position
@@ -78,17 +78,6 @@ impl ScreenBuffer {
         }
     }
 
-    // draws buffer from game manager
-    pub fn reconstruct(manager: &dyn GameManager, width: u32, height: u32) -> ScreenBuffer {
-        let mut buffer = ScreenBuffer::new(width, height);
-        for x in 0..width {
-            for y in 0..height {
-                buffer.put(x, y, manager.draw(x, y));
-            }
-        }
-        buffer
-    }
-
     // draws buffer from function
     pub fn construct<F>(width: u32, height: u32, mut generator: F) -> ScreenBuffer
     where
@@ -109,8 +98,8 @@ impl GameManager for ScreenBuffer {
     // dont really care about init
     fn init(&mut self, _width: u32, _height: u32, _has_fg: bool) { }
 
-    fn draw(&self, x: u32, y: u32) -> ScreenPixel {
-        self.get(x, y).unwrap_or_default()
+    fn draw(&self) -> ScreenBuffer {
+        self.clone()
     }
 
     fn tick(&mut self, _time: f64) { }

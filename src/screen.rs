@@ -21,13 +21,21 @@ enum Ground {
 }
 
 #[derive(Component)]
+struct Screen {
+    pub parts : Vec<Entity>,
+    pub x : i32,
+    pub y : i32,
+    pub width : u32,
+    pub height : u32,
+    pub manager : Entity,
+}
+
+#[derive(Component)]
 struct ScreenPart {
-    pub screen_height : u32,
     pub x : i32,
     pub i : i32,
-    pub previous_result : Text,
+    pub previous_state: Text,
     pub ground : Ground,
-    pub manager_id : Entity,
 }
 
 pub struct ScreenPlugin;
@@ -57,11 +65,13 @@ pub fn build_screen(
 ) -> Entity {
     let pixel_bg_scale: f32 = 4.0 / pixel_size as f32;
     let pixel_offset: f64 = 0.125 * pixel_bg_scale as f64;
-    let pixel_fg_scale: f32 = pixel_bg_scale / 2.0;
+    let pixel_fg_scale: f32 = 0.5 * pixel_bg_scale;
 
     manager.init(width, height, enable_fg);
-    let buffer = ScreenBuffer::reconstruct(&manager, width, height);
-    let manager_id = commands.spawn(manager).id();
+    let buffer = manager.draw();
+    let manager = commands.spawn(manager).id();
+
+    let mut parts: Vec<Entity> = vec![];
 
     // Basically its spawns 3 (or 2 without foreground) text displays per column:
     // 2 for the background and 1 for the foreground.
@@ -76,16 +86,14 @@ pub fn build_screen(
     for x in 0..width {
         for i in 0..=1 {
             let mut part = ScreenPart {
-                screen_height : height,
                 x : x as i32,
                 i : 1 - i,
-                previous_result : Text::default(),
+                previous_state: Text::default(),
                 ground : Ground::BackGround,
-                manager_id : manager_id,
             };
-            let result = draw_part(&part, &buffer);
-            part.previous_result = result.clone();
-            commands.spawn((
+            let result = draw_part(&part, &buffer, height);
+            part.previous_state = result.clone();
+            let part = commands.spawn((
                 TextDisplayEntityBundle {
                     display_scale : valence::entity::display::Scale([pixel_bg_scale, pixel_bg_scale, pixel_bg_scale].into()),
                     text_display_background : valence::entity::text_display::Background(0),
@@ -95,28 +103,27 @@ pub fn build_screen(
                     layer : layer_id,
                     position : Position::new([
                         // some weird magic numbers to move it since we are using colored characters and not background color
-                        position.0[0] as f64 + x as f64 * pixel_offset + 0.05 * pixel_bg_scale as f64,
-                        position.0[1] as f64 + i as f64 * pixel_offset - 0.1 * pixel_bg_scale as f64,
-                        position.0[2] as f64
-                    ] as [f64; 3]),
+                        position.0[0] + x as f64 * pixel_offset + 0.05 * pixel_bg_scale as f64,
+                        position.0[1] + i as f64 * pixel_offset - 0.1 * pixel_bg_scale as f64,
+                        position.0[2]
+                    ]),
                     ..Default::default()
                 },
                 part,
-            ));
+            )).id();
+            parts.push(part);
         }
 
         if enable_fg {
             let mut part = ScreenPart {
-                screen_height : height,
                 x : x as i32,
                 i : 0,
-                previous_result : Text::default(),
+                previous_state: Text::default(),
                 ground : Ground::ForeGround,
-                manager_id : manager_id,
             };
-            let result = draw_part(&part, &buffer);
-            part.previous_result = result.clone();
-            commands.spawn((
+            let result = draw_part(&part, &buffer, height);
+            part.previous_state = result.clone();
+            let part = commands.spawn((
                 TextDisplayEntityBundle {
                     display_scale : valence::entity::display::Scale([pixel_fg_scale, pixel_fg_scale, pixel_fg_scale].into()),
                     text_display_background : valence::entity::text_display::Background(0),
@@ -126,55 +133,69 @@ pub fn build_screen(
                     layer : layer_id,
                     position : Position::new([
                         // magic numbers so it doesnt look weird
-                        position.0[0] as f64 + (x as f64 + 0.05) * pixel_offset + 0.1 * pixel_fg_scale as f64,
+                        position.0[0] + (x as f64 + 0.05) * pixel_offset + 0.1 * pixel_fg_scale as f64,
                         // move it down 1 more pixel to hide 1 character
-                        position.0[1] as f64 - 1.1 * pixel_offset,
+                        position.0[1] - 1.1 * pixel_offset,
                         // fix z-fighting (if any)
-                        position.0[2] as f64 + 0.001
-                    ] as [f64; 3]),
+                        position.0[2] + 0.001
+                    ]),
                     ..Default::default()
                 },
                 part,
-            ));
+            )).id();
+            parts.push(part);
         }
     }
 
-    return manager_id;
+    commands.spawn(Screen {
+        parts,
+        x: 0,
+        y: 0,
+        width,
+        height,
+        manager,
+    });
+
+    return manager;
 }
 
 fn update_screen(
     server: Res<Server>,
     mut managers: Query<One<&mut dyn GameManager>>,
-    mut screen: Query<(&mut valence::entity::text_display::Text, &mut ScreenPart), With<ScreenPart>>,
+    mut screens: Query<&mut Screen>,
+    mut screen_parts: Query<(&mut valence::entity::text_display::Text, &mut ScreenPart)>,
 ) {
-    // update screen. Doesn't update if it stays the same
     let time = server.current_tick() as f64 / server.tick_rate().get() as f64;
     
     managers.for_each_mut(|mut manager| {
         manager.tick(time);
     });
 
-    for (mut pixel, mut part) in &mut screen {
-        let manager = managers.get(part.manager_id).expect("Screen with no game manager. Forgot to register?");
-        let result = draw_part(&part, manager);
-        if part.previous_result != result {
-            pixel.0 = result.clone();
-            part.previous_result = result;
+    for screen in &mut screens {
+        let manager = managers.get(screen.manager).expect("Screen with no game manager. Forgot to register?");
+        let buffer = manager.draw();
+        for part_id in screen.parts.iter() {
+            let (mut text, mut part) = screen_parts.get_mut(*part_id).unwrap();
+            let state = draw_part(&part, &buffer, screen.height);
+            if part.previous_state != state {
+                text.0 = state.clone();
+                part.previous_state = state;
+            }
         }
     }
 }
 
 // draws part of the screen, since its 3 displays per column
-fn draw_part(part: &ScreenPart, manager: &dyn GameManager) -> Text {
+fn draw_part(part: &ScreenPart, buffer: &ScreenBuffer, height: u32) -> Text {
     let mut result = Text::default();
     if let Ground::BackGround = part.ground {
-        for y in 0..(part.screen_height / 2) {
-            let pixel = manager.draw(part.x as u32, y * 2 + part.i as u32);
+        for y in 0..(height / 2) {
+            let pixel = buffer.get(part.x as u32, y * 2 + part.i as u32).unwrap_or_default();
             result = result.add_child(Text::text(BG_PIXEL.to_string()).color(pixel.bg));
         }
     } else {
-        for y in 0..(part.screen_height) {
-            let pixel = manager.draw(part.x as u32, y);
+        for y in 0..height {
+            let pixel = buffer.get(part.x as u32, y).unwrap_or_default();
             if pixel.fg.0 == ' ' {
                 // some weird things happen if you use spaces in this thing
                 result = result.add_child(Text::text(BIAS_PIXEL.to_string()).color(pixel.bg));

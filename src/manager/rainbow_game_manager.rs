@@ -3,38 +3,27 @@ use noise::{NoiseFn, Simplex, Perlin};
 use valence::text::color::RgbColor;
 use valence::prelude::*;
 use crate::screen::buffer::ScreenBuffer;
+use crate::screen::game_manager::GameManager;
 use crate::screen::input::{Uid, PlayerAction};
 use crate::screen::pixel::{ScreenPixel, Style};
-
-use super::{StaticGameManager, Generator};
 
 const DEPTH: [char; 5] = ['*', '%', '#', '$', '@'];
 
 #[derive(Component, Default)]
-pub struct RainbowGenerator {
+pub struct RainbowGameManager {
     width : u32,
     height : u32,
     has_fg : bool,
     saturation_noise : Simplex,
     lightness_noise : Perlin,
-    time : f64
+    time : f64,
 }
 
-impl RainbowGenerator {
-    pub fn default_manager() -> StaticGameManager<RainbowGenerator> {
-        StaticGameManager::new(RainbowGenerator::default())
-    }
-}
-
-impl Generator for RainbowGenerator {
+impl GameManager for RainbowGameManager {
     fn init(&mut self, width: u32, height: u32, has_fg: bool) {
         self.width = width;
         self.height = height;
         self.has_fg = has_fg;
-    }
-
-    fn tick(&mut self, time: f64) {
-        self.time = time;
     }
 
     fn draw(&self) -> ScreenBuffer {
@@ -54,7 +43,7 @@ impl Generator for RainbowGenerator {
                 y_norm * 100.0,
                 self.time * 5.0
             ]);
-            
+
             let color = Hsl::from(
                 ((x_norm + y_norm + self.time * 2.0) as f32 * 180.0) % 360.0,
                 50.0 + 50.0 * saturation as f32,
@@ -81,9 +70,14 @@ impl Generator for RainbowGenerator {
                     Style::default()
                 )
             }
-            
+
             pixel
         })
+
+    }
+
+    fn tick(&mut self, time: f64) {
+        self.time = time;
     }
 
     fn action(&mut self, _player: Uid, _action: PlayerAction) { }

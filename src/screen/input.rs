@@ -196,7 +196,7 @@ fn project_position(screen: &Screen, position: &Position, look: &Look, is_sneaki
         // https://www.rosettacode.org/wiki/Find_the_intersection_of_a_line_with_a_plane#Rust
         let dot = ray_direction.dot(plane_normal);
 
-        if dot > 1e-6 {
+        if dot >= 0.0 {
             None
         } else {
             let distance = (ray_point - plane_point).dot(plane_normal) / dot;
@@ -253,8 +253,24 @@ fn process_actions(
     }
 
     for event in sneak_event.iter() {
-        let (mut data, _inventory, _held_item, _position, _look) = clients.get_mut(event.client).unwrap();
+        let (mut data, inventory, held_item, position, look) = clients.get_mut(event.client).unwrap();
         data.is_sneaking = matches!(event.state, SneakState::Start);
+        let Ok(screen) = screens.get(data.screen) else {
+            continue;
+        };
+        let Ok(mut manager) = managers.get_mut(screen.manager) else {
+            continue;
+        };
+        if !is_controller(inventory.slot(held_item.slot())) {
+            continue;
+        }
+
+        let position = project_position(screen, position, look, data.is_sneaking);
+        if data.old_screen_position == position {
+            continue;
+        }
+        data.old_screen_position = position;
+        manager.action(data.uid, PlayerAction::Hover { position, is_sneaking: data.is_sneaking });
     }
 
     for event in interact_item_event.iter() {

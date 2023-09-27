@@ -6,14 +6,16 @@ mod manager;
 use valence::message::ChatMessageEvent;
 use valence::prelude::*;
 use std::ops::Add;
-use bevy_trait_query::{One, RegisterExt};
+use bevy_trait_query::RegisterExt;
 
 use crate::screen::buffer::ScreenBuffer;
 use crate::screen::game_manager::GameManager;
 use crate::screen::input::GameData;
 use crate::manager::rainbow_game_manager::RainbowGameManager;
 use crate::manager::matrix_game_manager::MatrixGameManager;
+use crate::manager::paint_game_manager::PaintGameManager;
 use crate::manager::snake_game_manager::SnakeGameManager;
+use crate::screen::Screen;
 
 const SPAWN_Y: i32 = 64;
 
@@ -27,6 +29,7 @@ pub fn main() {
         .register_component_as::<dyn GameManager, MatrixGameManager>()
         .register_component_as::<dyn GameManager, RainbowGameManager>()
         .register_component_as::<dyn GameManager, SnakeGameManager>()
+        .register_component_as::<dyn GameManager, PaintGameManager>()
         .run();
 }
 
@@ -95,7 +98,7 @@ fn build(
         true,
         // Game manager
         // ScreenBuffer::load_image("valence.png", width, height, true)
-        MatrixGameManager::default()
+        PaintGameManager::default()
     );
 }
 
@@ -116,10 +119,10 @@ fn init_clients(
         Added<Client>,
     >,
     layers: Query<Entity, (With<EntityLayer>, With<ChunkLayer>)>,
-    managers: Query<(Entity, One<&mut dyn GameManager>)>,
+    screens: Query<(Entity, &Screen)>,
 ) {
     let layer = layers.single();
-    let (manager_id, _manager) = managers.single();
+    let (screen_id, _screen) = screens.single();
 
     for (
         entity,
@@ -140,7 +143,7 @@ fn init_clients(
         client.send_chat_message("Welcome to Valence! Screens plugin".italic());
 
         // required for inputs
-        screen::input::init_client(&mut commands, &mut data, entity, manager_id);
+        screen::input::init_client(&mut commands, &mut data, entity, screen_id);
         inventory.as_mut().set_slot(36, screen::input::get_controller_item());
     }
 }

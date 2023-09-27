@@ -91,6 +91,36 @@ impl ScreenBuffer {
         }
         buffer
     }
+
+    pub fn insert(&mut self, x: u32, y: u32, other: ScreenBuffer) {
+        for i in 0..other.width {
+            for j in 0..other.height {
+                if let Some(pixel) = other.get(i, j) {
+                    self.put(x + i, y + j, pixel);
+                }
+            }
+        }
+    }
+
+    pub fn insert_bg(&mut self, x: u32, y: u32, other: ScreenBuffer) {
+        for i in 0..other.width {
+            for j in 0..other.height {
+                if let Some(pixel) = other.get(i, j) {
+                    self.put_bg(x + i, y + j, pixel.bg);
+                }
+            }
+        }
+    }
+
+    pub fn insert_fg(&mut self, x: u32, y: u32, other: ScreenBuffer) {
+        for i in 0..other.width {
+            for j in 0..other.height {
+                if let Some(pixel) = other.get(i, j) {
+                    self.put_fg(x + i, y + j, pixel.fg.0, pixel.fg.1, pixel.fg.2);
+                }
+            }
+        }
+    }
 }
 
 // Buffer could be used as game manager

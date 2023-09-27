@@ -21,12 +21,12 @@ enum Ground {
 }
 
 #[derive(Component)]
-struct Screen {
+pub struct Screen {
     pub parts : Vec<Entity>,
-    pub x : i32,
-    pub y : i32,
+    pub position : Position,
     pub width : u32,
     pub height : u32,
+    pub pixel_size : u32,
     pub manager : Entity,
 }
 
@@ -149,10 +149,10 @@ pub fn build_screen(
 
     commands.spawn(Screen {
         parts,
-        x: 0,
-        y: 0,
+        position,
         width,
         height,
+        pixel_size,
         manager,
     });
 

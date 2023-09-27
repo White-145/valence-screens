@@ -6,13 +6,12 @@ pub mod pixel;
 use valence::prelude::*;
 use bevy_trait_query::One;
 use valence::entity::text_display::TextDisplayEntityBundle;
-use valence::Server;
 
 use buffer::ScreenBuffer;
 use game_manager::GameManager;
-
-use self::pixel::BG_PIXEL;
-use self::pixel::BIAS_PIXEL;
+use crate::screen::input::Uid;
+use crate::screen::pixel::BG_PIXEL;
+use crate::screen::pixel::BIAS_PIXEL;
 
 #[derive(Clone)]
 enum Ground {
@@ -28,6 +27,26 @@ pub struct Screen {
     pub height : u32,
     pub pixel_size : u32,
     pub manager : Entity,
+    pub occupied_uids : [bool; Uid::MAX as usize],
+    pub next_free_uid : Uid,
+}
+
+impl Screen {
+    pub fn next_uid(&mut self) -> Uid {
+        let uid = self.next_free_uid;
+        self.occupied_uids[self.next_free_uid as usize] = true;
+        while self.occupied_uids[self.next_free_uid as usize] {
+            self.next_free_uid += 1;
+        }
+        uid
+    }
+
+    pub fn free_uid(&mut self, uid: Uid) {
+        self.occupied_uids[uid as usize] = false;
+        if uid < self.next_free_uid {
+            self.next_free_uid = uid;
+        }
+    }
 }
 
 #[derive(Component)]
@@ -36,6 +55,32 @@ struct ScreenPart {
     pub i : i32,
     pub previous_state: Text,
     pub ground : Ground,
+}
+
+impl ScreenPart {
+    pub fn draw(&mut self, buffer: &ScreenBuffer, height: u32) -> Text {
+        let mut result = Text::default();
+        if let Ground::BackGround = self.ground {
+            for y in 0..(height / 2) {
+                let pixel = buffer.get(self.x as u32, y * 2 + self.i as u32).unwrap_or_default();
+                result = result.add_child(Text::text(BG_PIXEL.to_string()).color(pixel.bg));
+            }
+        } else {
+            for y in 0..height {
+                let pixel = buffer.get(self.x as u32, y).unwrap_or_default();
+                if pixel.fg.0 == ' ' {
+                    // some weird things happen if you use spaces in this thing
+                    result = result.add_child(Text::text(BIAS_PIXEL.to_string()).color(pixel.bg));
+                } else {
+                    result = result.add_child(pixel.fg.2.apply(Text::text(pixel.fg.0.to_string()).color(pixel.fg.1)));
+                }
+            }
+            // extra wide character to remove shaking from thin characters
+            // (thats why foreground is moved 1 extra pixel down in spawn function)
+            result = result.add_child(Text::text(BIAS_PIXEL.to_string()));
+        }
+        result
+    }
 }
 
 pub struct ScreenPlugin;
@@ -91,7 +136,7 @@ pub fn build_screen(
                 previous_state: Text::default(),
                 ground : Ground::BackGround,
             };
-            let result = draw_part(&part, &buffer, height);
+            let result = part.draw(&buffer, height);
             part.previous_state = result.clone();
             let part = commands.spawn((
                 TextDisplayEntityBundle {
@@ -121,7 +166,7 @@ pub fn build_screen(
                 previous_state: Text::default(),
                 ground : Ground::ForeGround,
             };
-            let result = draw_part(&part, &buffer, height);
+            let result = part.draw(&buffer, height);
             part.previous_state = result.clone();
             let part = commands.spawn((
                 TextDisplayEntityBundle {
@@ -154,21 +199,20 @@ pub fn build_screen(
         height,
         pixel_size,
         manager,
+        occupied_uids: [false; Uid::MAX as usize],
+        next_free_uid: 0,
     });
 
     return manager;
 }
 
 fn update_screen(
-    server: Res<Server>,
     mut managers: Query<One<&mut dyn GameManager>>,
     mut screens: Query<&mut Screen>,
     mut screen_parts: Query<(&mut valence::entity::text_display::Text, &mut ScreenPart)>,
 ) {
-    let time = server.current_tick() as f64 / server.tick_rate().get() as f64;
-    
     managers.for_each_mut(|mut manager| {
-        manager.tick(time);
+        manager.tick();
     });
 
     for screen in &mut screens {
@@ -176,36 +220,11 @@ fn update_screen(
         let buffer = manager.draw();
         for part_id in screen.parts.iter() {
             let (mut text, mut part) = screen_parts.get_mut(*part_id).unwrap();
-            let state = draw_part(&part, &buffer, screen.height);
-            if part.previous_state != state {
-                text.0 = state.clone();
-                part.previous_state = state;
+            let result = part.draw(&buffer, screen.height);
+            if part.previous_state != result {
+                text.0 = result.clone();
+                part.previous_state = result;
             }
         }
     }
-}
-
-// draws part of the screen, since its 3 displays per column
-fn draw_part(part: &ScreenPart, buffer: &ScreenBuffer, height: u32) -> Text {
-    let mut result = Text::default();
-    if let Ground::BackGround = part.ground {
-        for y in 0..(height / 2) {
-            let pixel = buffer.get(part.x as u32, y * 2 + part.i as u32).unwrap_or_default();
-            result = result.add_child(Text::text(BG_PIXEL.to_string()).color(pixel.bg));
-        }
-    } else {
-        for y in 0..height {
-            let pixel = buffer.get(part.x as u32, y).unwrap_or_default();
-            if pixel.fg.0 == ' ' {
-                // some weird things happen if you use spaces in this thing
-                result = result.add_child(Text::text(BIAS_PIXEL.to_string()).color(pixel.bg));
-            } else {
-                result = result.add_child(pixel.fg.2.apply(Text::text(pixel.fg.0.to_string()).color(pixel.fg.1)));
-            }
-        }
-        // extra wide character to remove shaking from thin characters
-        // (thats why foreground is moved 1 extra pixel down in spawn function)
-        result = result.add_child(Text::text(BIAS_PIXEL.to_string()));
-    }
-    result
 }

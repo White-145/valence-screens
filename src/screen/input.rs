@@ -96,37 +96,14 @@ pub struct PlayerData {
     screen : Entity,
 }
 
-// Game data for id management
-#[derive(Resource)]
-pub struct GameData {
-    occupied_uids : [bool; Uid::MAX as usize],
-    next_free_uid : Uid,
-}
-
-fn next_uid(data: &mut GameData) -> Uid {
-    let uid = data.next_free_uid;
-    data.occupied_uids[data.next_free_uid as usize] = true;
-    while data.occupied_uids[data.next_free_uid as usize] {
-        data.next_free_uid += 1;
-    }
-    uid
-}
-
-fn free_uid(data: &mut GameData, uid: Uid) {
-    data.occupied_uids[uid as usize] = false;
-    if uid < data.next_free_uid {
-        data.next_free_uid = uid;
-    }
-}
-
-pub fn init_client(commands: &mut Commands, data: &mut GameData, client: Entity, screen: Entity) {
+pub fn init_client(commands: &mut Commands, client: Entity, screen: &mut Screen, screen_id: Entity) {
     commands.get_entity(client).unwrap().insert(PlayerData {
-        uid : next_uid(data),
+        uid : screen.next_uid(),
         is_sneaking : false,
         prevent_primary : false,
         old_slot : 0,
         old_screen_position : None,
-        screen,
+        screen : screen_id,
     });
 }
 
@@ -147,11 +124,7 @@ pub fn get_controller_item() -> ItemStack {
 pub fn build(app: &mut App) {
     app
         .add_systems(Update, (update_primary_prevention, remove_clients))
-        .add_systems(EventLoopUpdate, process_actions)
-        .insert_resource(GameData {
-            occupied_uids : [false; Uid::MAX as usize],
-            next_free_uid : 0,
-        });
+        .add_systems(EventLoopUpdate, process_actions);
 }
 
 fn update_primary_prevention(mut player_datas: Query<&mut PlayerData>) {
@@ -161,17 +134,15 @@ fn update_primary_prevention(mut player_datas: Query<&mut PlayerData>) {
 }
 
 pub fn remove_clients(
-    mut data: ResMut<GameData>,
-    mut screens: Query<&Screen>,
+    mut screens: Query<&mut Screen>,
     mut managers: Query<One<&mut dyn GameManager>>,
     player_datas: Query<&PlayerData>,
     mut clients: RemovedComponents<Client>,
 ) {
-
     for client in clients.iter() {
         if let Ok(player_data) = player_datas.get(client) {
-            free_uid(data.as_mut(), player_data.uid);
-            if let Ok(screen) = screens.get_mut(player_data.screen) {
+            if let Ok(mut screen) = screens.get_mut(player_data.screen) {
+                screen.free_uid(player_data.uid);
                 if let Ok(mut manager) = managers.get_mut(screen.manager) {
                     manager.action(player_data.uid, PlayerAction::Disconnect);
                 }

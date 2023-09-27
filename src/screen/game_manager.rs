@@ -10,8 +10,8 @@ pub trait GameManager: Send + Sync + 'static {
     // draw screen pixel at given position. x, y is always 0..width, 0..height
     fn draw(&self) -> ScreenBuffer;
 
-    // called every tick with time server been running for
-    fn tick(&mut self, time: f64);
+    // called every tick
+    fn tick(&mut self);
 
     // player action with player uid, action and whether player is sneaking (for extra functionality)
     fn action(&mut self, player: u8, action: PlayerAction);

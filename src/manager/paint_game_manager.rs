@@ -12,6 +12,8 @@ const DECORATIONS: [char; 15] = [
     ']', '~', '\'', '<', '>',
 ];
 const DECORATION_COLOR_DIFF: u8 = 10;
+const PALETTE_WIDTH: u32 = 3;
+const PALETTE_HEIGHT: u32 = 8;
 
 #[derive(Component)]
 pub struct PaintGameManager {
@@ -42,7 +44,7 @@ impl Default for PaintGameManager {
 
 impl PaintGameManager {
     fn get_palette() -> ScreenBuffer {
-        let mut buffer = ScreenBuffer::new(3, 8);
+        let mut buffer = ScreenBuffer::new(PALETTE_WIDTH, PALETTE_HEIGHT);
         buffer.put(0, 0, ScreenPixel::new_bg(RgbColor::new(170, 0, 0)));
         buffer.put(1, 0, ScreenPixel::new_bg(RgbColor::new(255, 85, 85)));
         buffer.put(2, 0, ScreenPixel::new_bg(RgbColor::new(255, 153, 255)));
@@ -108,7 +110,7 @@ impl GameManager for PaintGameManager {
     fn draw(&self) -> ScreenBuffer {
         let mut buffer = self.buffer.clone();
         if self.is_palette_opened {
-            buffer.insert(self.width - 3, 0, PaintGameManager::get_palette());
+            buffer.insert(self.width - PALETTE_WIDTH, 0, PaintGameManager::get_palette());
         }
         for position in self.positions {
             if let Some((x, y)) = position {
@@ -119,7 +121,7 @@ impl GameManager for PaintGameManager {
         buffer
     }
 
-    fn tick(&mut self, _time: f64) {
+    fn tick(&mut self) {
         if self.palette_cooldown > 0 {
             self.palette_cooldown -= 1;
         }
@@ -155,9 +157,8 @@ impl GameManager for PaintGameManager {
 
             let mut color = pixel.bg;
             if self.is_palette_opened {
-                if x >= self.width - 3 && y < 8 {
-                    let x = x + 3 - self.width;
-                    color = PaintGameManager::get_palette().get(x, y).unwrap_or_default().bg;
+                if x >= self.width - PALETTE_WIDTH && y < PALETTE_HEIGHT {
+                    color = PaintGameManager::get_palette().get(x + PALETTE_WIDTH - self.width, y).unwrap_or_default().bg;
                 }
             }
 

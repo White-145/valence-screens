@@ -132,7 +132,7 @@ impl GameManager for ScreenBuffer {
         self.clone()
     }
 
-    fn tick(&mut self, _time: f64) { }
+    fn tick(&mut self) { }
 
     fn action(&mut self, _player: u8, _action: PlayerAction) { }
 }

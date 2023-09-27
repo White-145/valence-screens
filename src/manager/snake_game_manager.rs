@@ -89,7 +89,7 @@ impl GameManager for SnakeGameManager {
         buffer
     }
 
-    fn tick(&mut self, _time: f64) {
+    fn tick(&mut self) {
         if let None = self.current_player {
             return;
         }

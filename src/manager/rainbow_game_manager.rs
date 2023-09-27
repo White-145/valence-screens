@@ -24,6 +24,7 @@ impl GameManager for RainbowGameManager {
         self.width = width;
         self.height = height;
         self.has_fg = has_fg;
+        self.time = 0.0;
     }
 
     fn draw(&self) -> ScreenBuffer {
@@ -76,8 +77,8 @@ impl GameManager for RainbowGameManager {
 
     }
 
-    fn tick(&mut self, time: f64) {
-        self.time = time;
+    fn tick(&mut self) {
+        self.time += 0.05;
     }
 
     fn action(&mut self, _player: Uid, _action: PlayerAction) { }

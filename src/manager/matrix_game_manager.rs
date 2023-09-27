@@ -76,7 +76,7 @@ impl GameManager for MatrixGameManager {
         buffer
     }
 
-    fn tick(&mut self, _time: f64) {
+    fn tick(&mut self) {
         let mut new_trails: Vec<(i32, i32)> = Vec::new();
         for trail in &self.trails {
             if trail.1 - 1 <= self.height as i32 + self.trail_len {

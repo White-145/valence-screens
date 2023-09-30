@@ -65,11 +65,9 @@ impl GameManager for RainbowGameManager {
                 ]) / 2.0 + 0.5) * DEPTH.len() as f64) as usize;
                 if depth == DEPTH.len() { depth -= 1; }
 
-                pixel.fg = (
-                    DEPTH[depth],
-                    RgbColor::new(255, 255, 255),
-                    Style::default()
-                )
+                pixel.fg_char = DEPTH[depth];
+                pixel.fg_color = RgbColor::new(255, 255, 255);
+                pixel.fg_style = Style::default();
             }
 
             pixel

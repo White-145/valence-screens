@@ -38,25 +38,32 @@ impl Style {
 #[derive(Clone)]
 pub struct ScreenPixel {
     pub bg : RgbColor,
-    pub fg : (char, RgbColor, Style),
+    pub fg_char : char,
+    pub fg_color : RgbColor,
+    pub fg_style : Style,
 }
 
 impl Default for ScreenPixel {
     fn default() -> Self {
-        ScreenPixel { bg: RgbColor::new(0, 0, 0), fg: (' ', RgbColor::new(255, 255, 255), Style::default()) }
+        ScreenPixel {
+            bg: RgbColor::new(0, 0, 0),
+            fg_char: ' ',
+            fg_color : RgbColor::new(255, 255, 255),
+            fg_style : Style::default()
+        }
     }
 }
 
 impl ScreenPixel {
     pub fn new(bg: RgbColor, fg_char: char, fg_color: RgbColor, fg_style: Style) -> Self {
-        ScreenPixel { bg, fg : (fg_char, fg_color, fg_style) }
+        ScreenPixel { bg, fg_char, fg_color, fg_style }
     }
 
     pub fn new_bg(bg: RgbColor) -> Self {
-        ScreenPixel { bg, fg : (' ', RgbColor::new(255, 255, 255), Style::default()) }
+        ScreenPixel { bg, fg_char : ' ', fg_color : RgbColor::new(255, 255, 255), fg_style : Style::default() }
     }
 
     pub fn new_fg(fg_char: char, fg_color: RgbColor, fg_style: Style) -> Self {
-        ScreenPixel { bg : RgbColor::new(0, 0, 0), fg : (fg_char, fg_color, fg_style) }
+        ScreenPixel { bg : RgbColor::new(0, 0, 0), fg_char, fg_color, fg_style }
     }
 }

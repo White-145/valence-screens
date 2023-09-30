@@ -59,7 +59,9 @@ impl ScreenBuffer {
     pub fn put_fg(&mut self, x: u32, y: u32, fg_char: char, fg_color: RgbColor, fg_style: Style) {
         let index = self.get_index(x, y);
         if let Some(i) = index {
-            self.buffer[i].fg = (fg_char, fg_color, fg_style);
+            self.buffer[i].fg_char = fg_char;
+            self.buffer[i].fg_color = fg_color;
+            self.buffer[i].fg_style = fg_style;
         }
     }
 
@@ -116,7 +118,7 @@ impl ScreenBuffer {
         for i in 0..other.width {
             for j in 0..other.height {
                 if let Some(pixel) = other.get(i, j) {
-                    self.put_fg(x + i, y + j, pixel.fg.0, pixel.fg.1, pixel.fg.2);
+                    self.put_fg(x + i, y + j, pixel.fg_char, pixel.fg_color, pixel.fg_style);
                 }
             }
         }

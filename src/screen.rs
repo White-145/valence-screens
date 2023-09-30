@@ -68,11 +68,11 @@ impl ScreenPart {
         } else {
             for y in 0..height {
                 let pixel = buffer.get(self.x as u32, y).unwrap_or_default();
-                if pixel.fg.0 == ' ' {
+                if pixel.fg_char == ' ' {
                     // some weird things happen if you use spaces in this thing
                     result = result.add_child(Text::text(BIAS_PIXEL.to_string()).color(pixel.bg));
                 } else {
-                    result = result.add_child(pixel.fg.2.apply(Text::text(pixel.fg.0.to_string()).color(pixel.fg.1)));
+                    result = result.add_child(pixel.fg_style.apply(Text::text(pixel.fg_char.to_string()).color(pixel.fg_color)));
                 }
             }
             // extra wide character to remove shaking from thin characters

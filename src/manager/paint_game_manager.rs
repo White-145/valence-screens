@@ -56,9 +56,12 @@ pub struct PaintGameManager {
     buffer : ScreenBuffer,
     is_palette_opened : bool,
     palette_cooldown : u32,
+    // my solution on storing information for each player
     primary : [(RgbColor, char, RgbColor); Uid::MAX as usize],
     secondary : [(RgbColor, char, RgbColor); Uid::MAX as usize],
     positions : [Option<(u32, u32)>; Uid::MAX as usize],
+    is_shown : [bool; Uid::MAX as usize],
+    show_cooldown : [u32; Uid::MAX as usize],
 }
 
 impl Default for PaintGameManager {
@@ -72,6 +75,8 @@ impl Default for PaintGameManager {
             primary : [(RgbColor::new(0, 0, 0), ' ', RgbColor::new(255, 255, 255)); Uid::MAX as usize],
             secondary : [(RgbColor::new(255, 255, 255), ' ', RgbColor::new(0, 0, 0)); Uid::MAX as usize],
             positions : [None; Uid::MAX as usize],
+            is_shown : [true; Uid::MAX as usize],
+            show_cooldown : [0; Uid::MAX as usize],
         }
     }
 }
@@ -108,10 +113,14 @@ impl GameManager for PaintGameManager {
                 }
             }
         }
-        for position in self.positions {
-            if let Some((x, y)) = position {
-                let color = buffer.get(x, y).unwrap_or_default().bg;
-                buffer.put_fg(x, y, '⏶', RgbColor::new(255 - color.r, 255 - color.g, 255 - color.b), Style::default());
+        for i in 0..Uid::MAX {
+            let position = self.positions[i];
+            let is_shown = self.is_shown[i];
+            if is_shown {
+                if let Some((x, y)) = position {
+                    let color = buffer.get(x, y).unwrap_or_default().bg;
+                    buffer.put_fg(x, y, '⏶', RgbColor::new(255 - color.r, 255 - color.g, 255 - color.b), Style::default());
+                }
             }
         }
         buffer
@@ -120,6 +129,11 @@ impl GameManager for PaintGameManager {
     fn tick(&mut self) {
         if self.palette_cooldown > 0 {
             self.palette_cooldown -= 1;
+        }
+        for i in 0..Uid::MAX {
+            if self.show_cooldown[i] > 0 {
+                self.show_cooldown[i] -= 1;
+            }
         }
     }
 
@@ -139,7 +153,7 @@ impl GameManager for PaintGameManager {
         } else if let PlayerAction::Swap { is_sneaking : _is_sneaking } = action {
             if self.palette_cooldown == 0 {
                 self.is_palette_opened = !self.is_palette_opened;
-                self.palette_cooldown = 40;
+                self.palette_cooldown = 20;
             }
         } else if let PlayerAction::Primary { position, is_sneaking } = action {
             let Some((x, y)) = position else {
@@ -173,12 +187,20 @@ impl GameManager for PaintGameManager {
             } else {
                 self.primary[player as usize] = color;
             }
+        } else if let PlayerAction::Drop { is_sneaking : _is_sneaking } = action {
+            if self.show_cooldown[player as usize] == 0 {
+                self.show_cooldown[player as usize] = 10;
+                let is_shown = self.is_shown[player as usize];
+                self.is_shown[player as usize] = !is_shown;
+            }
         } else if let PlayerAction::Hover { position, is_sneaking : _is_sneaking} = action {
             self.positions[player as usize] = position;
         } else if let PlayerAction::Disconnect = action {
             self.primary[player as usize] = (RgbColor::new(0, 0, 0), ' ', RgbColor::new(255, 255, 255));
             self.secondary[player as usize] = (RgbColor::new(255, 255, 255), ' ', RgbColor::new(0, 0, 0));
             self.positions[player as usize] = None;
+            self.is_shown[player as usize] = true;
+            self.show_cooldown[player as usize] = 0;
         }
     }
 }

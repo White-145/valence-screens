@@ -133,6 +133,7 @@ impl GameManager for PaintGameManager {
         for i in 0..Uid::MAX {
             if self.show_cooldown[i as usize] > 0 {
                 self.show_cooldown[i as usize] -= 1;
+
             }
         }
     }

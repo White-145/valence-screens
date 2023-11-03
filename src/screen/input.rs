@@ -11,7 +11,7 @@ use crate::screen::Screen;
 
 use super::game_manager::GameManager;
 
-// uid type; maybe extended later
+// uid type; may be extended later
 pub type Uid = u8;
 
 #[derive(PartialEq)]

@@ -3,7 +3,7 @@ use valence::text::color::RgbColor;
 use crate::screen::buffer::ScreenBuffer;
 use crate::screen::game_manager::GameManager;
 use crate::screen::input::{PlayerAction, Uid};
-use crate::screen::pixel::{ScreenPixel, Style};
+use crate::screen::pixel::{BIAS_PIXEL, ScreenPixel, Style};
 
 const PALETTE_WIDTH: u32 = 3;
 const PALETTE_HEIGHT: u32 = 8;
@@ -89,7 +89,7 @@ impl GameManager for PaintGameManager {
         if self.is_palette_opened {
             for x in 0..PALETTE_WIDTH {
                 for y in 0..PALETTE_HEIGHT {
-                    buffer.put(x, y, ScreenPixel::new_bg(PALETTE[(y * PALETTE_WIDTH + x) as usize]));
+                    buffer.put(x, y, ScreenPixel::new(RgbColor::new(0, 0, 0), BIAS_PIXEL, PALETTE[(y * PALETTE_WIDTH + x) as usize], Style::default()));
                 }
             }
             for x in 0..DECORATIONS_WIDTH {

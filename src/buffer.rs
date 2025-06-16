@@ -10,7 +10,7 @@ use super::pixel::ScreenPixel;
 use super::*;
 
 // Useful struct to manage screen pixels
-#[derive(Component, Clone, Default)]
+#[derive(Component, Clone, Default, Debug)]
 pub struct ScreenBuffer {
     width: u32,
     height: u32,

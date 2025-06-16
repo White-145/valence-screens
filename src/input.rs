@@ -1,18 +1,36 @@
+use crate::Screen;
 use bevy_trait_query::One;
-use valence::prelude::*;
-use valence::inventory::{HeldItem, DropItemStackEvent, UpdateSelectedSlotEvent};
-use valence::interact_item::InteractItemEvent;
-use valence::hand_swing::HandSwingEvent;
 use valence::event_loop::PacketEvent;
+use valence::hand_swing::HandSwingEvent;
+use valence::interact_item::InteractItemEvent;
+use valence::inventory::{DropItemStackEvent, HeldItem, UpdateSelectedSlotEvent};
 use valence::movement::MovementEvent;
-use valence::protocol::bytes::Buf;
 use valence::nbt::compound;
-use crate::screen::Screen;
+use valence::prelude::*;
+use valence::protocol::bytes::Buf;
 
 use super::game_manager::GameManager;
 
 // uid type; may be extended later
 pub type Uid = u8;
+
+impl Screen {
+    pub fn next_uid(&mut self) -> Uid {
+        let uid = self.next_free_uid;
+        self.occupied_uids[self.next_free_uid as usize] = true;
+        while self.occupied_uids[self.next_free_uid as usize] {
+            self.next_free_uid += 1;
+        }
+        uid
+    }
+
+    pub fn free_uid(&mut self, uid: Uid) {
+        self.occupied_uids[uid as usize] = false;
+        if uid < self.next_free_uid {
+            self.next_free_uid = uid;
+        }
+    }
+}
 
 #[derive(PartialEq)]
 pub enum MoveDir {
@@ -45,42 +63,42 @@ impl MoveDir {
 pub enum PlayerAction {
     // Left click
     Primary {
-        position : Option<(u32, u32)>,
-        is_sneaking : bool,
+        position: Option<(u32, u32)>,
+        is_sneaking: bool,
     },
     // Right click
     Secondary {
-        position : Option<(u32, u32)>,
-        is_sneaking : bool,
+        position: Option<(u32, u32)>,
+        is_sneaking: bool,
     },
     // Swap Hands
     Swap {
-        is_sneaking : bool,
+        is_sneaking: bool,
     },
     // Drop
     Drop {
-        is_sneaking : bool,
+        is_sneaking: bool,
     },
     // Player movement with WASD (requires sitting on something)
     // TODO: implement
     Move {
-        direction : MoveDir,
-        is_sneaking : bool,
+        direction: MoveDir,
+        is_sneaking: bool,
     },
     // Slot movement (last 4 slots of the hotbar)
     SpecialMove {
-        direction : MoveDir,
-        is_sneaking : bool,
+        direction: MoveDir,
+        is_sneaking: bool,
     },
     // Text input via chat/command
     // TODO: implement
     Input {
-        input : String,
+        input: String,
     },
     // Change of cursor position on screen
     Hover {
-        position : Option<(u32, u32)>,
-        is_sneaking : bool,
+        position: Option<(u32, u32)>,
+        is_sneaking: bool,
     },
     // Player disconnected and uid is freed
     Disconnect,
@@ -89,22 +107,27 @@ pub enum PlayerAction {
 // Player data to manage inputs
 #[derive(Component)]
 pub struct PlayerData {
-    uid : Uid,
-    is_sneaking : bool,
-    prevent_primary : bool,
-    old_slot : u16,
-    old_screen_position : Option<(u32, u32)>,
-    screen : Entity,
+    uid: Uid,
+    is_sneaking: bool,
+    prevent_primary: bool,
+    old_slot: u16,
+    old_screen_position: Option<(u32, u32)>,
+    screen: Entity,
 }
 
-pub fn init_client(commands: &mut Commands, client: Entity, screen: &mut Screen, screen_id: Entity) {
+pub fn init_client(
+    commands: &mut Commands,
+    client: Entity,
+    screen: &mut Screen,
+    screen_id: Entity,
+) {
     commands.get_entity(client).unwrap().insert(PlayerData {
-        uid : screen.next_uid(),
-        is_sneaking : false,
-        prevent_primary : false,
-        old_slot : 0,
-        old_screen_position : None,
-        screen : screen_id,
+        uid: screen.next_uid(),
+        is_sneaking: false,
+        prevent_primary: false,
+        old_slot: 0,
+        old_screen_position: None,
+        screen: screen_id,
     });
 }
 
@@ -118,13 +141,12 @@ pub fn get_controller_item() -> ItemStack {
             },
             // Custom tag for controller
             "CustomControllerKey" => compound! { }
-        })
+        }),
     )
 }
 
 pub fn build(app: &mut App) {
-    app
-        .add_systems(Update, (update_primary_prevention, remove_clients))
+    app.add_systems(Update, (update_primary_prevention, remove_clients))
         .add_systems(EventLoopUpdate, process_actions);
 }
 
@@ -140,7 +162,7 @@ pub fn remove_clients(
     player_datas: Query<&PlayerData>,
     mut clients: RemovedComponents<Client>,
 ) {
-    for client in clients.iter() {
+    for client in clients.read() {
         if let Ok(player_data) = player_datas.get(client) {
             if let Ok(mut screen) = screens.get_mut(player_data.screen) {
                 screen.free_uid(player_data.uid);
@@ -152,7 +174,12 @@ pub fn remove_clients(
     }
 }
 
-fn project_position(screen: &Screen, position: &Position, look: &Look, is_sneaking: bool) -> Option<(u32, u32)> {
+fn project_position(
+    screen: &Screen,
+    position: &Position,
+    look: &Look,
+    is_sneaking: bool,
+) -> Option<(u32, u32)> {
     fn euler_angles_to_vec(yaw: f32, pitch: f32) -> DVec3 {
         let pitch = pitch as f64 / 180.0 * std::f64::consts::PI;
         let yaw = yaw as f64 / 180.0 * std::f64::consts::PI;
@@ -164,7 +191,12 @@ fn project_position(screen: &Screen, position: &Position, look: &Look, is_sneaki
         DVec3::new(x, y, z)
     }
 
-    fn line_plane_intersection(ray_direction: DVec3, ray_point: DVec3, plane_normal: DVec3, plane_point: DVec3) -> Option<DVec3> {
+    fn line_plane_intersection(
+        ray_direction: DVec3,
+        ray_point: DVec3,
+        plane_normal: DVec3,
+        plane_point: DVec3,
+    ) -> Option<DVec3> {
         // https://www.rosettacode.org/wiki/Find_the_intersection_of_a_line_with_a_plane#Rust
         let dot = ray_direction.dot(plane_normal);
 
@@ -188,7 +220,8 @@ fn project_position(screen: &Screen, position: &Position, look: &Look, is_sneaki
     let plane_normal = DVec3::new(0.0, 0.0, 1.0);
     let plane_point = screen.position.0;
 
-    let intersection = line_plane_intersection(ray_direction, ray_point, plane_normal, plane_point)?;
+    let intersection =
+        line_plane_intersection(ray_direction, ray_point, plane_normal, plane_point)?;
     let diff = intersection - screen.position.0;
 
     let pixel_offset = 1.0 / (screen.pixel_size as f64 * 2.0);
@@ -208,10 +241,17 @@ fn project_position(screen: &Screen, position: &Position, look: &Look, is_sneaki
 }
 
 // Some player inputs.
+#[allow(clippy::too_many_arguments)]
 fn process_actions(
     screens: Query<&Screen>,
     mut managers: Query<One<&mut dyn GameManager>>,
-    mut clients: Query<(&mut PlayerData, &mut Inventory, &mut HeldItem, &Position, &Look)>,
+    mut clients: Query<(
+        &mut PlayerData,
+        &mut Inventory,
+        &mut HeldItem,
+        &Position,
+        &Look,
+    )>,
     mut sneak_event: EventReader<SneakEvent>,
     mut interact_item_event: EventReader<InteractItemEvent>,
     mut hand_swing_event: EventReader<HandSwingEvent>,
@@ -221,11 +261,17 @@ fn process_actions(
     mut movement_event: EventReader<MovementEvent>,
 ) {
     fn is_controller(item: &ItemStack) -> bool {
-        matches!(&item.nbt, Some(..)) && item.nbt.as_ref().unwrap().contains_key("CustomControllerKey")
+        matches!(&item.nbt, Some(..))
+            && item
+                .nbt
+                .as_ref()
+                .unwrap()
+                .contains_key("CustomControllerKey")
     }
 
-    for event in sneak_event.iter() {
-        let (mut data, inventory, held_item, position, look) = clients.get_mut(event.client).unwrap();
+    for event in sneak_event.read() {
+        let (mut data, inventory, held_item, position, look) =
+            clients.get_mut(event.client).unwrap();
         data.is_sneaking = matches!(event.state, SneakState::Start);
         let Ok(screen) = screens.get(data.screen) else {
             continue;
@@ -242,11 +288,18 @@ fn process_actions(
             continue;
         }
         data.old_screen_position = position;
-        manager.action(data.uid, PlayerAction::Hover { position, is_sneaking: data.is_sneaking });
+        manager.action(
+            data.uid,
+            PlayerAction::Hover {
+                position,
+                is_sneaking: data.is_sneaking,
+            },
+        );
     }
 
-    for event in interact_item_event.iter() {
-        let (mut data, inventory, held_item, position, look) = clients.get_mut(event.client).unwrap();
+    for event in interact_item_event.read() {
+        let (mut data, inventory, held_item, position, look) =
+            clients.get_mut(event.client).unwrap();
         if !is_controller(inventory.slot(held_item.slot())) {
             continue;
         }
@@ -258,10 +311,16 @@ fn process_actions(
         };
         data.prevent_primary = true;
         let position = project_position(screen, position, look, data.is_sneaking);
-        manager.action(data.uid, PlayerAction::Secondary { position, is_sneaking : data.is_sneaking });
+        manager.action(
+            data.uid,
+            PlayerAction::Secondary {
+                position,
+                is_sneaking: data.is_sneaking,
+            },
+        );
     }
 
-    for event in hand_swing_event.iter() {
+    for event in hand_swing_event.read() {
         let (data, inventory, held_item, position, look) = clients.get(event.client).unwrap();
         if data.prevent_primary {
             continue;
@@ -276,10 +335,16 @@ fn process_actions(
             continue;
         };
         let position = project_position(screen, position, look, data.is_sneaking);
-        manager.action(data.uid, PlayerAction::Primary { position, is_sneaking : data.is_sneaking });
+        manager.action(
+            data.uid,
+            PlayerAction::Primary {
+                position,
+                is_sneaking: data.is_sneaking,
+            },
+        );
     }
 
-    for event in packet_event.iter() {
+    for event in packet_event.read() {
         // I didnt find the event for swapping hands, so heres my solution based on wiki.vg/Protocol
         if event.id != 0x1D || event.data.clone().get_u8() != 6 {
             continue;
@@ -294,14 +359,20 @@ fn process_actions(
         let Ok(mut manager) = managers.get_mut(screen.manager) else {
             continue;
         };
-        manager.action(data.uid, PlayerAction::Swap { is_sneaking : data.is_sneaking });
+        manager.action(
+            data.uid,
+            PlayerAction::Swap {
+                is_sneaking: data.is_sneaking,
+            },
+        );
     }
 
-    for event in drop_event.iter() {
+    for event in drop_event.read() {
         if !is_controller(&event.stack) {
             continue;
         }
-        let (mut data, mut inventory, _held_item, _position, _look) = clients.get_mut(event.client).unwrap();
+        let (mut data, mut inventory, _held_item, _position, _look) =
+            clients.get_mut(event.client).unwrap();
         let Ok(screen) = screens.get(data.screen) else {
             continue;
         };
@@ -310,7 +381,12 @@ fn process_actions(
         };
         data.prevent_primary = true;
 
-        manager.action(data.uid, PlayerAction::Drop { is_sneaking : data.is_sneaking });
+        manager.action(
+            data.uid,
+            PlayerAction::Drop {
+                is_sneaking: data.is_sneaking,
+            },
+        );
 
         // Return item back
         let mut slot = 36;
@@ -318,14 +394,19 @@ fn process_actions(
             slot = event_slot;
         } else if let Some(first_slot) = inventory.first_empty_slot_in(9..45) {
             // prioritize hotbar
-            slot = if first_slot < 18 { first_slot + 27 } else { first_slot - 9 }
+            slot = if first_slot < 18 {
+                first_slot + 27
+            } else {
+                first_slot - 9
+            }
         }
         inventory.set_slot(slot, event.stack.clone());
     }
 
-    for event in change_slot_event.iter() {
+    for event in change_slot_event.read() {
         // Cool (imo) movement input based on hotbar slots (last 4 of them)
-        let (mut data, inventory, mut held_item, _position, _look) = clients.get_mut(event.client).unwrap();
+        let (mut data, inventory, mut held_item, _position, _look) =
+            clients.get_mut(event.client).unwrap();
         let old_slot = data.old_slot;
         data.old_slot = event.slot as u16;
         if event.slot < 5 {
@@ -345,15 +426,22 @@ fn process_actions(
             6 => MoveDir::Up,
             7 => MoveDir::Down,
             8 => MoveDir::Right,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         data.old_slot = old_slot;
         held_item.set_slot(36 + old_slot);
-        manager.action(data.uid, PlayerAction::SpecialMove { direction : dir, is_sneaking : data.is_sneaking });
+        manager.action(
+            data.uid,
+            PlayerAction::SpecialMove {
+                direction: dir,
+                is_sneaking: data.is_sneaking,
+            },
+        );
     }
 
-    for event in movement_event.iter() {
-        let (mut data, inventory, held_item, position, look) = clients.get_mut(event.client).unwrap();
+    for event in movement_event.read() {
+        let (mut data, inventory, held_item, position, look) =
+            clients.get_mut(event.client).unwrap();
         let Ok(screen) = screens.get(data.screen) else {
             continue;
         };
@@ -369,7 +457,12 @@ fn process_actions(
             continue;
         }
         data.old_screen_position = position;
-        manager.action(data.uid, PlayerAction::Hover { position, is_sneaking: data.is_sneaking });
+        manager.action(
+            data.uid,
+            PlayerAction::Hover {
+                position,
+                is_sneaking: data.is_sneaking,
+            },
+        );
     }
 }
-

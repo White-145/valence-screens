@@ -6,13 +6,20 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy-trait-query = "0.3.0"
-bevy-trait-resource = "0.1.1"
+bevy-trait-query = "0.6.0"
 colors-transform = "0.2.11"
-dominant_color = "0.4.0"
-image = "0.24.7"
+dominant_color = {version = "0.4.0", optional = true}
+image = {version = "0.24.7", optional = true}
 noise = "0.8.2"
-palette = "0.7.3"
+palette = {version = "0.7.3", optional = true}
 rand = "0.8.5"
 time = "0.3.26"
 valence = { git = "https://github.com/valence-rs/valence" }
+
+[features]
+image = ["dep:image", "dep:dominant_color", "dep:palette"]
+input = []
+
+[[bin]]
+name = "valence-screens"
+required-features = ["input", "image"]

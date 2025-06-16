@@ -40,7 +40,7 @@ impl ScreenBuffer {
     // gets screen pixel at given position, None if position is out of bounds
     pub fn get(&self, x: u32, y: u32) -> Option<ScreenPixel> {
         let index = self.get_index(x, y)?;
-        Some(self.buffer[index].clone())
+        Some(self.buffer[index])
     }
 
     // puts screen pixel to given position
@@ -72,7 +72,7 @@ impl ScreenBuffer {
     // fills buffer with given pixel
     pub fn fill(&mut self, pixel: ScreenPixel) {
         for i in 0..(self.width * self.height) as usize {
-            self.buffer[i] = pixel.clone();
+            self.buffer[i] = pixel;
         }
     }
 

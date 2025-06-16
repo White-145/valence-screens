@@ -72,9 +72,7 @@ impl GameManager for SnakeGameManager {
             self.apple.1 as u32,
             RgbColor::new(255, 0, 0),
         );
-        let pointer_pos = self
-            .direction
-            .apply(self.snake.get(self.snake.len() - 1).unwrap(), 2);
+        let pointer_pos = self.direction.apply(self.snake.last().unwrap(), 2);
         if pointer_pos.0 >= 0 && pointer_pos.1 >= 0 && self.current_player.is_some() {
             let pointer = match self.direction {
                 MoveDir::Up => '⏶',
@@ -114,7 +112,7 @@ impl GameManager for SnakeGameManager {
     }
 
     fn tick(&mut self) {
-        if let None = self.current_player {
+        if self.current_player.is_none() {
             return;
         }
         if self.delay >= 1 {
@@ -123,7 +121,7 @@ impl GameManager for SnakeGameManager {
         } else {
             self.delay += 1;
         }
-        let pos = self.snake.get(self.snake.len() - 1).unwrap();
+        let pos = self.snake.last().unwrap();
         let next_pos = self.direction.apply(pos, 1);
         if self.apple == next_pos {
             self.gen_apple();

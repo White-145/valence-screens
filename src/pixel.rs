@@ -6,7 +6,7 @@ pub const BG_PIXEL: char = '■';
 pub const BIAS_PIXEL: char = '█';
 
 // Foreground style
-#[derive(Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct Style {
     bold: bool,
     strikethrough: bool,
@@ -50,7 +50,7 @@ impl Style {
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct ScreenPixel {
     pub bg: RgbColor,
     pub fg_char: char,

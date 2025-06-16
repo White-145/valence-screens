@@ -47,8 +47,8 @@ impl ScreenBuffer {
             // 57.120705 is maximum possible difference between mean and dominant of the same image
             // found using diff(grayscale(255), grayscale((255 + 255 + 0) / 3))
             // not sure tho but it didnt fail yet
-            let diff = lab_color1.difference(lab_color2) / 57.120705;
-            diff
+
+            lab_color1.difference(lab_color2) / 57.120705
         }
 
         let mut img = image::open(filename).unwrap();

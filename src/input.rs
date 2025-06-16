@@ -241,6 +241,7 @@ fn project_position(
 }
 
 // Some player inputs.
+#[allow(clippy::too_many_arguments)]
 fn process_actions(
     screens: Query<&Screen>,
     mut managers: Query<One<&mut dyn GameManager>>,

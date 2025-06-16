@@ -2,22 +2,22 @@ use rand::Rng;
 use valence::prelude::*;
 use valence::text::color::RgbColor;
 
-use crate::screen::pixel::Style;
-use crate::screen::input::{PlayerAction, Uid, MoveDir};
-use crate::screen::buffer::ScreenBuffer;
-use crate::screen::game_manager::GameManager;
+use valence_screens::buffer::ScreenBuffer;
+use valence_screens::game_manager::GameManager;
+use valence_screens::input::{MoveDir, PlayerAction, Uid};
+use valence_screens::pixel::Style;
 
 #[derive(Component)]
 pub struct SnakeGameManager {
-    width : u32,
-    height : u32,
-    snake : Vec<(i32, i32)>,
+    width: u32,
+    height: u32,
+    snake: Vec<(i32, i32)>,
     apple: (i32, i32),
-    direction : MoveDir,
-    current_player : Option<Uid>,
-    score : u32,
-    high_score : u32,
-    delay : u32,
+    direction: MoveDir,
+    current_player: Option<Uid>,
+    score: u32,
+    high_score: u32,
+    delay: u32,
 }
 
 impl Default for SnakeGameManager {
@@ -27,7 +27,7 @@ impl Default for SnakeGameManager {
             height: 0,
             snake: vec![],
             apple: (0, 0),
-            direction : MoveDir::Up,
+            direction: MoveDir::Up,
             current_player: None,
             score: 0,
             high_score: 0,
@@ -67,8 +67,14 @@ impl GameManager for SnakeGameManager {
             let color = 127 + (128.0 / self.snake.len() as f64 * (i + 1) as f64) as u8;
             buffer.put_bg(snake.0 as u32, snake.1 as u32, RgbColor::new(0, color, 0));
         }
-        buffer.put_bg(self.apple.0 as u32, self.apple.1 as u32, RgbColor::new(255, 0, 0));
-        let pointer_pos = self.direction.apply(self.snake.get(self.snake.len() - 1).unwrap(), 2);
+        buffer.put_bg(
+            self.apple.0 as u32,
+            self.apple.1 as u32,
+            RgbColor::new(255, 0, 0),
+        );
+        let pointer_pos = self
+            .direction
+            .apply(self.snake.get(self.snake.len() - 1).unwrap(), 2);
         if pointer_pos.0 >= 0 && pointer_pos.1 >= 0 && self.current_player.is_some() {
             let pointer = match self.direction {
                 MoveDir::Up => '⏶',
@@ -76,15 +82,33 @@ impl GameManager for SnakeGameManager {
                 MoveDir::Down => '⏷',
                 MoveDir::Right => '⏵',
             };
-            buffer.put_fg(pointer_pos.0 as u32, pointer_pos.1 as u32, pointer, RgbColor::new(128, 128, 128), Style::default());
+            buffer.put_fg(
+                pointer_pos.0 as u32,
+                pointer_pos.1 as u32,
+                pointer,
+                RgbColor::new(128, 128, 128),
+                Style::default(),
+            );
         }
         let score_str = format!("SCORE:{}", self.score);
         for (i, char) in score_str.chars().enumerate() {
-            buffer.put_fg(i as u32 + 1, 1, char, RgbColor::new(255, 255, 255), Style::default());
+            buffer.put_fg(
+                i as u32 + 1,
+                1,
+                char,
+                RgbColor::new(255, 255, 255),
+                Style::default(),
+            );
         }
         let high_score_str = format!("HIGH:{}", self.high_score);
         for (i, char) in high_score_str.chars().enumerate() {
-            buffer.put_fg(self.width - high_score_str.len() as u32 - 1 + i as u32, 1, char, RgbColor::new(255, 255, 255), Style::default());
+            buffer.put_fg(
+                self.width - high_score_str.len() as u32 - 1 + i as u32,
+                1,
+                char,
+                RgbColor::new(255, 255, 255),
+                Style::default(),
+            );
         }
         buffer
     }
@@ -107,7 +131,12 @@ impl GameManager for SnakeGameManager {
         } else {
             self.snake.remove(0);
         }
-        if next_pos.0 < 0 || next_pos.1 < 0 || next_pos.0 >= self.width as i32 || next_pos.1 >= self.height as i32 || self.snake.contains(&next_pos) {
+        if next_pos.0 < 0
+            || next_pos.1 < 0
+            || next_pos.0 >= self.width as i32
+            || next_pos.1 >= self.height as i32
+            || self.snake.contains(&next_pos)
+        {
             if self.high_score < self.score {
                 self.high_score = self.score;
             }
@@ -118,7 +147,11 @@ impl GameManager for SnakeGameManager {
     }
 
     fn action(&mut self, player: Uid, action: PlayerAction) {
-        if let PlayerAction::SpecialMove { direction, is_sneaking : _is_sneaking } = action {
+        if let PlayerAction::SpecialMove {
+            direction,
+            is_sneaking: _is_sneaking,
+        } = action
+        {
             if let Some(current_player) = self.current_player {
                 if player == current_player && direction != self.direction.opposite() {
                     self.direction = direction;

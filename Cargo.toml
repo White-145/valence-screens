@@ -13,7 +13,7 @@ image = {version = "0.24.7", optional = true}
 noise = "0.8.2"
 palette = {version = "0.7.3", optional = true}
 rand = "0.8.5"
-time = "0.3.26"
+time = "0.3.47"
 valence = { git = "https://github.com/valence-rs/valence" }
 
 [features]
